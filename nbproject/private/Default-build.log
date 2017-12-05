@@ -1,0 +1,11 @@
+Scanning dependencies of target Fotokite
+[ 11%] Building CXX object CMakeFiles/Fotokite.dir/Communication.cpp.o
+[ 22%] Building CXX object CMakeFiles/Fotokite.dir/DataLog.cpp.o
+[ 33%] Building CXX object CMakeFiles/Fotokite.dir/Fotokite.cpp.o
+[ 44%] Building CXX object CMakeFiles/Fotokite.dir/FotokiteState.cpp.o
+[ 55%] Building CXX object CMakeFiles/Fotokite.dir/Serial.cpp.o
+[ 66%] Building CXX object CMakeFiles/Fotokite.dir/SerialCommunication.cpp.o
+[ 77%] Building CXX object CMakeFiles/Fotokite.dir/SocketCommunication.cpp.o
+[ 88%] Building CXX object CMakeFiles/Fotokite.dir/main.cpp.o
+[100%] Linking CXX executable Fotokite
+[100%] Built target Fotokite
