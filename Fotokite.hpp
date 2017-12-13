@@ -8,6 +8,7 @@
 #ifndef FOTOKITE_HPP
 #define FOTOKITE_HPP
 
+#include "opencv2/core.hpp"
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
@@ -20,6 +21,7 @@
 #include "SerialCommunication.hpp"
 
 using namespace std;
+using namespace cv;
 
 class Fotokite {
 public:
@@ -68,7 +70,11 @@ public:
     // Print current state
     void printState();
     
-    void goToWaypoint(double, double, double, double, double, double);
+    void goToWaypoint(double, double, double, double, double, double, double, double, double);
+    void positionControl(double targetTetherLength, double targetElevation, double targetAzimuth, double tetherTolerance, double ElevationTolerance, double azimuthTolerance, double tetherRate, double elevationRate, double azimuthRate);
+
+    void velocityControl(double x, double y, double z, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ);
+
     
     void executePath(string);
     

@@ -12,6 +12,9 @@
 
 #define PI 3.14159265
 
+// Switch between position control and velocity control. Comment if you want position control. Uncomment if you want velocity control.
+//#define VELOCITY_CONTROL
+
 Fotokite::Fotokite(const char * ip_address, const short port) {
 
     // Initialize Fotokite state
@@ -518,6 +521,52 @@ double Fotokite::azimuthControl(double targetAzimuth, double tolerance) {
 
 }
 
+void Fotokite::velocityControl(double x, double y, double z, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ) {
+
+    // Compute Jacobian
+    Mat jacobian = Mat::zeros(3, 3, CV_64F);
+    jacobian.at<double>(0, 0) = cos(currentElevation) * cos(currentAzimuth);
+    jacobian.at<double>(0, 1) = -currentTetherLength * cos(currentAzimuth) * sin(currentElevation);
+    jacobian.at<double>(0, 2) = -currentTetherLength * cos(currentElevation) * sin(currentAzimuth);
+    jacobian.at<double>(1, 0) = sin(currentElevation);
+    jacobian.at<double>(1, 1) = currentTetherLength * cos(currentElevation);
+    jacobian.at<double>(1, 2) = 0;
+    jacobian.at<double>(2, 0) = -cos(currentElevation) * sin(currentAzimuth);
+    jacobian.at<double>(2, 1) = currentTetherLength * sin(currentAzimuth) * sin(currentElevation);
+    jacobian.at<double>(2, 2) = -currentTetherLength * cos(currentElevation) * cos(currentAzimuth);
+
+    // Velocity vector going from start to target
+    Mat velocityVector = Mat::zeros(3, 1, CV_64F);
+    velocityVector.at<double>(0, 0) = x - currentX;
+    velocityVector.at<double>(1, 0) = y - currentY;
+    velocityVector.at<double>(2, 0) = z - currentZ;
+
+    // Commands for velocity control
+    Mat commands = jacobian.inv() * velocityVector;
+
+    // Gain
+    double gain = 0.5;
+    commands = gain * commands;
+
+    // Send commands
+    posL(commands.at<double>(0, 0));
+    posV(commands.at<double>(1, 0));
+    posH(commands.at<double>(2, 0));
+}
+
+void Fotokite::positionControl(double targetTetherLength, double targetElevation, double targetAzimuth, double tetherTolerance, double ElevationTolerance, double azimuthTolerance, double tetherRate, double elevationRate, double azimuthRate) {
+
+    // Tether control
+    tetherRate = tetherControl(targetTetherLength, tetherTolerance);
+
+    // Elevation control
+    elevationRate = elevationControl(targetElevation, ElevationTolerance);
+
+    // Azimuth control
+    azimuthRate = azimuthControl(targetAzimuth, azimuthTolerance);
+
+}
+
 /**
  * Go to specified waypoint given in Cartesian coordinate system.
  * 
@@ -528,15 +577,31 @@ double Fotokite::azimuthControl(double targetAzimuth, double tolerance) {
  * @param theta_y Not implemented
  * @param theta_z Not implemented
  */
-void Fotokite::goToWaypoint(double x, double y, double z, double theta_x, double theta_y, double theta_z) {
+void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, double thetaX, double thetaY, double thetaZ, double contactPointX, double contactPointY, double contactPointZ) {
 
     // Waypoint acceptance radius (0.4 m is approximate position error of Fotokite)
     double waypointAcceptanceRadius = 0.4;
 
     // Target tether, elevation, and azimuth
-    double targetTetherLength = sqrt(x * x + y * y + z * z);
-    double targetElevation = asin(y / targetTetherLength);
-    double targetAzimuth = atan2(x, z) - PI / 2;
+    double targetTetherLength;
+    double targetElevation;
+    double targetAzimuth;
+
+    if (contactPointX == 0 && contactPointY == 0 && contactPointZ == 0) {
+
+        // Tether is not touching any obstacle
+        targetTetherLength = sqrt(targetX * targetX + targetY * targetY + targetZ * targetZ);
+        targetElevation = asin(targetY / targetTetherLength);
+        targetAzimuth = atan2(targetX, targetZ) - PI / 2;
+
+    } else {
+
+        // Tether is touching an obstacle at contact point
+        targetAzimuth = atan2(targetZ - contactPointZ, targetX - contactPointX);
+        targetElevation = atan2(targetY - contactPointY, sqrt(pow(targetX - contactPointX, 2) + pow(targetZ - contactPointZ, 2)));
+        targetTetherLength = sqrt(pow(contactPointX, 2) + pow(contactPointY, 2) + pow(contactPointZ, 2)) + sqrt(pow(targetX - contactPointX, 2) + pow(targetY - contactPointY, 2) + pow(targetZ - contactPointZ, 2));
+
+    }
 
     // Was waypoint reached
     bool waypointReached = false;
@@ -591,8 +656,14 @@ void Fotokite::goToWaypoint(double x, double y, double z, double theta_x, double
         currentY = currentTetherLength * sin(currentElevation);
         currentZ = -currentTetherLength * cos(currentElevation) * sin(currentAzimuth);
 
+#ifdef VELOCITY_CONTROL
+        velocityControl(targetX, targetY, targetZ, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ);
+#else
+        positionControl(targetTetherLength, targetElevation, targetAzimuth, tetherTolerance, ElevationTolerance, azimuthTolerance, tetherRate, elevationRate, azimuthRate);
+#endif
+
         // Distance to waypoint
-        waypointDistance = sqrt(pow(currentX - x, 2) + pow(currentY - y, 2) + pow(currentZ - z, 2));
+        waypointDistance = sqrt(pow(currentX - targetX, 2) + pow(currentY - targetY, 2) + pow(currentZ - targetZ, 2));
 
         // Check if waypoint was reached
         waypointReached = waypointDistance < waypointAcceptanceRadius;
@@ -600,22 +671,13 @@ void Fotokite::goToWaypoint(double x, double y, double z, double theta_x, double
         // Print distance to waypoint
         cout << waypointDistance << endl;
 
-        // Tether control
-        tetherRate = tetherControl(targetTetherLength, tetherTolerance);
-
-        // Elevation control
-        elevationRate = elevationControl(targetElevation, ElevationTolerance);
-
-        // Azimuth control
-        azimuthRate = azimuthControl(targetAzimuth, azimuthTolerance);
-
         // Log
-        log(x, y, z, targetTetherLength, targetElevation, targetAzimuth, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ, tetherRate, elevationRate, azimuthRate, waypointAcceptanceRadius, waypointDistance, waypointReached);
-        
+        log(targetX, targetY, targetZ, targetTetherLength, targetElevation, targetAzimuth, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ, tetherRate, elevationRate, azimuthRate, waypointAcceptanceRadius, waypointDistance, waypointReached);
+
     }
 
     // Print waypoint reached
-    cout << "Waypoint " << x << " " << y << " " << z << " reached." << endl;
+    cout << "Waypoint " << targetX << " " << targetY << " " << targetZ << " reached." << endl;
 }
 
 /**
@@ -638,7 +700,6 @@ void Fotokite::executePath(string fileName) {
         // For each line (one line is one waypoint)
         while (getline(file, line)) {
 
-
             string::size_type nextCharacterPosition;
 
             // Parse x
@@ -652,11 +713,23 @@ void Fotokite::executePath(string fileName) {
             line = line.substr(nextCharacterPosition);
             double z = stod(line);
 
+            // Parse contact point x
+            line = line.substr(nextCharacterPosition);
+            double contactPointX = stod(line, &nextCharacterPosition);
+
+            // Parse contact point y
+            line = line.substr(nextCharacterPosition);
+            double contactPointY = stod(line);
+
+            // Parse contact point z
+            line = line.substr(nextCharacterPosition);
+            double contactPointZ = stod(line, &nextCharacterPosition);
+
             // Print target waypoint
-            cout << "Going to waypoint " << x << " " << y << " " << z << "." << endl;
+            cout << "Going to waypoint " << x << " " << y << " " << z << " with contact point " << contactPointX << " " << contactPointY << " " << contactPointZ << "." << endl;
 
             // Go to waypoint
-            goToWaypoint(x, y, z, 0, 0, 0);
+            goToWaypoint(x, y, z, 0, 0, 0, contactPointX, contactPointY, contactPointZ);
 
         }
 
@@ -714,7 +787,7 @@ void Fotokite::log(double targetX, double targetY, double targetZ, double target
 
     logFile << currentZ;
     logFile << " ";
-    
+
     logFile << tetherRate;
     logFile << " ";
 

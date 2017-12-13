@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
     //    Fotokite * fotokite = new Fotokite("127.0.0.1", 5050);
 
     // Initialize Fotokite interface for USB serial interface
-    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem44");
+    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem1");
 
     // Execute path
     fotokite->executePath("input/path.txt");
