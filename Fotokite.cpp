@@ -587,21 +587,21 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
     double targetElevation;
     double targetAzimuth;
 
-    if (contactPointX == 0 && contactPointY == 0 && contactPointZ == 0) {
-
-        // Tether is not touching any obstacle
-        targetTetherLength = sqrt(targetX * targetX + targetY * targetY + targetZ * targetZ);
-        targetElevation = asin(targetY / targetTetherLength);
-        targetAzimuth = atan2(targetX, targetZ) - PI / 2;
-
-    } else {
+//    if (contactPointX == 0 && contactPointY == 0 && contactPointZ == 0) { // TODO remove this
+//
+//        // Tether is not touching any obstacle
+//        targetTetherLength = sqrt(targetX * targetX + targetY * targetY + targetZ * targetZ);
+//        targetElevation = asin(targetY / targetTetherLength);
+//        targetAzimuth = atan2(targetX, targetZ) - PI / 2;
+//
+//    } else {
 
         // Tether is touching an obstacle at contact point
-        targetAzimuth = atan2(targetZ - contactPointZ, targetX - contactPointX);
-        targetElevation = atan2(targetY - contactPointY, sqrt(pow(targetX - contactPointX, 2) + pow(targetZ - contactPointZ, 2)));
+        targetAzimuth = atan2(-(targetZ - contactPointZ), targetX - contactPointX);
+        targetElevation = asin((targetY - contactPointY) / (sqrt(pow(targetX - contactPointX, 2) + pow(targetY - contactPointY, 2) + pow(targetZ - contactPointZ, 2))));
         targetTetherLength = sqrt(pow(contactPointX, 2) + pow(contactPointY, 2) + pow(contactPointZ, 2)) + sqrt(pow(targetX - contactPointX, 2) + pow(targetY - contactPointY, 2) + pow(targetZ - contactPointZ, 2));
 
-    }
+//    }
 
     // Was waypoint reached
     bool waypointReached = false;
@@ -668,12 +668,12 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
         // Check if waypoint was reached
         waypointReached = waypointDistance < waypointAcceptanceRadius;
 
-        // Print distance to waypoint
-        cout << waypointDistance << endl;
-
         // Log
         log(targetX, targetY, targetZ, targetTetherLength, targetElevation, targetAzimuth, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ, tetherRate, elevationRate, azimuthRate, waypointAcceptanceRadius, waypointDistance, waypointReached);
 
+        // Print debugging information to console
+        cout << targetTetherLength << " " << currentTetherLength << " | " << targetElevation << " " << currentElevation << " | " << targetAzimuth << " " << currentAzimuth << " | " << waypointDistance << endl;       
+        //cout << currentElevation << " " << currentAzimuth << endl;      
     }
 
     // Print waypoint reached
@@ -711,7 +711,7 @@ void Fotokite::executePath(string fileName) {
 
             // Parse z
             line = line.substr(nextCharacterPosition);
-            double z = stod(line);
+            double z = stod(line, &nextCharacterPosition);
 
             // Parse contact point x
             line = line.substr(nextCharacterPosition);
@@ -719,7 +719,7 @@ void Fotokite::executePath(string fileName) {
 
             // Parse contact point y
             line = line.substr(nextCharacterPosition);
-            double contactPointY = stod(line);
+            double contactPointY = stod(line, &nextCharacterPosition);
 
             // Parse contact point z
             line = line.substr(nextCharacterPosition);
@@ -728,6 +728,34 @@ void Fotokite::executePath(string fileName) {
             // Print target waypoint
             cout << "Going to waypoint " << x << " " << y << " " << z << " with contact point " << contactPointX << " " << contactPointY << " " << contactPointZ << "." << endl;
 
+            // Scale waypoints as the planner coordinates are in obstacle units (1 unit is 33 cm). To convert to meters, multiply by 0.33.
+            double scale = 0.33;
+            x *= scale;
+            y *= scale;
+            z *= scale;
+            contactPointX *= scale;
+            contactPointY *= scale;
+            contactPointZ *= scale;
+            
+            // Modify the coordinates to correspond to the coordinates used in the palanner
+            double oldX = x;
+            double oldY = y;
+            double oldZ = z;      
+            x = oldY;
+            y = oldZ;
+            z = oldX;
+            double oldContactPointX = contactPointX;
+            double oldContactPointY = contactPointY;
+            double oldContactPointZ = contactPointZ;      
+            contactPointX = oldContactPointY;
+            contactPointY = oldContactPointZ;
+            contactPointZ = oldContactPointX;
+            
+            // Shift entire path up to prevent beeing too close to the ground (TODO fix this)
+            double offset = 1;
+            y += offset;
+//            contactPointY += offset; // TODO offset to contact point
+            
             // Go to waypoint
             goToWaypoint(x, y, z, 0, 0, 0, contactPointX, contactPointY, contactPointZ);
 
@@ -760,6 +788,15 @@ void Fotokite::log(double targetX, double targetY, double targetZ, double target
 
     logFile << targetZ;
     logFile << " ";
+    
+    logFile << currentX;
+    logFile << " ";
+
+    logFile << currentY;
+    logFile << " ";
+
+    logFile << currentZ;
+    logFile << " ";
 
     logFile << targetTetherLength;
     logFile << " ";
@@ -777,15 +814,6 @@ void Fotokite::log(double targetX, double targetY, double targetZ, double target
     logFile << " ";
 
     logFile << currentAzimuth;
-    logFile << " ";
-
-    logFile << currentX;
-    logFile << " ";
-
-    logFile << currentY;
-    logFile << " ";
-
-    logFile << currentZ;
     logFile << " ";
 
     logFile << tetherRate;
