@@ -31,15 +31,28 @@ SerialCommunication::~SerialCommunication() {
     close_connection();
 }
 
+/**
+ * Send message to Fotokite.
+ * 
+ * @param message
+ */
 void SerialCommunication::send(string message) {
     this->serial.print(message);
     usleep(1000);
 }
 
+/**
+ * Receive message from Fotokite.
+ * 
+ * @return 
+ */
 string SerialCommunication::receive() {
     return this->serial.readBytesUntil('\n', 1024);
 }
 
+/**
+ * Close connection with Fotokite.
+ */
 void SerialCommunication::close_connection() {
     
     // Stop listening

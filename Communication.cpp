@@ -7,6 +7,11 @@
 
 #include "Communication.hpp"
 
+/**
+ * Initialize communication with Fotokite.
+ * 
+ * @param fotokiteState
+ */
 Communication::Communication(FotokiteState * fotokiteState) {
     
     // Save Fotokite state object
@@ -20,6 +25,9 @@ Communication::Communication(const Communication& orig) {
 Communication::~Communication() {
 }
 
+/**
+ * Starts remote control mode on Fotokite.
+ */
 void Communication::startRemoteControl() {
     
     // Send 5 carriage returns
@@ -43,6 +51,9 @@ void Communication::startRemoteControl() {
     
 }
 
+/**
+ * Start listener that will be listening for incoming messages.
+ */
 void Communication::startListener() {
 
     listening = true;
@@ -50,6 +61,9 @@ void Communication::startListener() {
 
 }
 
+/**
+ * Listen for new message.
+ */
 void Communication::listen() {
     
     string newMessage;

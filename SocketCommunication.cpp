@@ -42,6 +42,11 @@ SocketCommunication::~SocketCommunication() {
     close_connection();
 }
 
+/**
+ * Send message to Fotokite.
+ * 
+ * @param message
+ */
 void SocketCommunication::send(string message) {
 
     // Send message
@@ -54,6 +59,11 @@ void SocketCommunication::send(string message) {
 
 }
 
+/**
+ * Receive message from Fotokite.
+ * 
+ * @return 
+ */
 string SocketCommunication::receive() {
 
     // Initialize buffer for the message
@@ -73,6 +83,9 @@ string SocketCommunication::receive() {
 
 }
 
+/**
+ * Close connection with Fotokite.
+ */
 void SocketCommunication::close_connection() {
     
     // Stop listening

@@ -15,6 +15,12 @@
 // Switch between position control and velocity control. Comment if you want position control. Uncomment if you want velocity control.
 //#define VELOCITY_CONTROL
 
+/**
+ * Initialize wireless communication with the Fotokite server.
+ * 
+ * @param ip_address
+ * @param port
+ */
 Fotokite::Fotokite(const char * ip_address, const short port) {
 
     // Initialize Fotokite state
@@ -28,6 +34,11 @@ Fotokite::Fotokite(const char * ip_address, const short port) {
 
 }
 
+/**
+ * Initialize wired serial communication with the Fotokite ground control station.
+ * 
+ * @param serialPort
+ */
 Fotokite::Fotokite(const char * serialPort) {
 
     // Initialize Fotokite state
@@ -44,6 +55,9 @@ Fotokite::Fotokite(const char * serialPort) {
 Fotokite::Fotokite(const Fotokite& orig) {
 }
 
+/**
+ * Stop Fotokite motion, stop communication, and close log.
+ */
 Fotokite::~Fotokite() {
 
     // Stop motion
@@ -405,7 +419,7 @@ void Fotokite::printState() {
  * 
  * @return Tether length in meters
  */
-double Fotokite::getScaledTetherLenght() {
+double Fotokite::getScaledTetherLength() {
 
     // Tether unit transform. 100 ticks is 0.406 m. Therefore, 1 tick is 0.406/100 m.
     double tetherScale = 0.406 / 100;
@@ -423,7 +437,7 @@ double Fotokite::getScaledTetherLenght() {
 double Fotokite::tetherControl(double targetTetherLength, double tolerance) {
 
     // Current scaled tether length
-    double currentScaledTetherLength = Fotokite::getScaledTetherLenght();
+    double currentScaledTetherLength = Fotokite::getScaledTetherLength();
 
     // Tether control
     double tetherControl;
@@ -521,6 +535,19 @@ double Fotokite::azimuthControl(double targetAzimuth, double tolerance) {
 
 }
 
+/**
+ * Velocity control for Fotokite's attitude.
+ * 
+ * @param x Desired X coordinate
+ * @param y Desired Y coordinate
+ * @param z Desired Z coordinate
+ * @param currentTetherLength
+ * @param currentElevation
+ * @param currentAzimuth
+ * @param currentX
+ * @param currentY
+ * @param currentZ
+ */
 void Fotokite::velocityControl(double x, double y, double z, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ) {
 
     // Compute Jacobian
@@ -554,6 +581,19 @@ void Fotokite::velocityControl(double x, double y, double z, double currentTethe
     posH(commands.at<double>(2, 0));
 }
 
+/**
+ * Position control for Fotokite's attitude.
+ * 
+ * @param x Desired X coordinate
+ * @param y Desired Y coordinate
+ * @param z Desired Z coordinate
+ * @param currentTetherLength
+ * @param currentElevation
+ * @param currentAzimuth
+ * @param currentX
+ * @param currentY
+ * @param currentZ
+ */
 void Fotokite::positionControl(double targetTetherLength, double targetElevation, double targetAzimuth, double tetherTolerance, double ElevationTolerance, double azimuthTolerance, double tetherRate, double elevationRate, double azimuthRate) {
 
     // Tether control
@@ -564,6 +604,115 @@ void Fotokite::positionControl(double targetTetherLength, double targetElevation
 
     // Azimuth control
     azimuthRate = azimuthControl(targetAzimuth, azimuthTolerance);
+
+}
+
+/**
+ * Computes length of the portion of the tether between the last contact point
+ * and the ground control station. This portion of the tether is static and does
+ * not move.
+ * 
+ * @param newContactPointX X coordinate of the new contact point
+ * @param newContactPointY Y coordinate of the new contact point
+ * @param newContactPointZ Z coordinate of the new contact point
+ * @return static tether length
+ */
+struct Fotokite::TetherLength Fotokite::computeStaticTetherLength(double newContactPointX, double newContactPointY, double newContactPointZ) {
+    
+    if (contactPoints.empty()) {
+        
+        // There are no contact points
+        TetherLength tetherLength;
+        tetherLength.segment = 0;
+        tetherLength.total = 0;
+        return tetherLength;
+        
+    } else {
+        
+        // Get last contact point
+        ContactPoint lastContactPoint = contactPoints.top();
+        
+        // Compute segment length and total length
+        double newSegmentTetherLength = sqrt(pow(newContactPointX - lastContactPoint.x, 2) + pow(newContactPointY - lastContactPoint.y, 2) + pow(newContactPointZ - lastContactPoint.z, 2));
+        double newTotalTetherLength = lastContactPoint.totalTetherLength + newSegmentTetherLength;
+
+        TetherLength tetherLength;
+        tetherLength.segment = newSegmentTetherLength;
+        tetherLength.total = newTotalTetherLength;
+        return tetherLength;
+        
+    }
+    
+}
+
+/**
+ * Add new contact point to the list of all active contact points.
+ * 
+ * @param newContactPointX
+ * @param newContactPointY
+ * @param newContactPointZ
+ */
+void Fotokite::addContactPoint(double newContactPointX, double newContactPointY, double newContactPointZ) {
+    
+    // Compute static tether length
+    TetherLength tetherLength = computeStaticTetherLength(newContactPointX, newContactPointY, newContactPointZ);  
+    
+    // Initialize new contact point
+    ContactPoint newContactPoint = ContactPoint(newContactPointX, newContactPointY, newContactPointZ, tetherLength.segment, tetherLength.total);
+
+    // Push it on the stack
+    contactPoints.push(newContactPoint);
+    
+}
+
+/**
+ * Update list of active contact points with the new contact point. It might be
+ * necessary to add the new contact point or relax the previous one.
+ * 
+ * @param newContactPointX
+ * @param newContactPointY
+ * @param newContactPointZ
+ */
+void Fotokite::updateContactPoints(double newContactPointX, double newContactPointY, double newContactPointZ) {
+
+    // Stack is empty
+    if (contactPoints.empty()) {
+        
+        addContactPoint(newContactPointX, newContactPointY, newContactPointZ);
+                
+        return;
+
+    }
+
+    ContactPoint lastContactPoint = contactPoints.top();
+
+    if (!(newContactPointX == lastContactPoint.x && newContactPointY == lastContactPoint.y && newContactPointZ == lastContactPoint.z)) {
+
+        // Stack has only one element, therefore add the new contact point
+        if (contactPoints.size() == 1) {
+
+            addContactPoint(newContactPointX, newContactPointY, newContactPointZ);
+
+            return;
+
+        }
+
+        ContactPoint lastContactPointTemporary = contactPoints.top();
+        contactPoints.pop();
+        ContactPoint secondToLastContactPoint = contactPoints.top();
+        contactPoints.push(lastContactPointTemporary);
+
+        if (newContactPointX == secondToLastContactPoint.x && newContactPointY == secondToLastContactPoint.y && newContactPointZ == secondToLastContactPoint.z) {
+
+            contactPoints.pop();
+
+        } else {
+
+            addContactPoint(newContactPointX, newContactPointY, newContactPointZ);
+
+        }
+
+    }
 
 }
 
@@ -579,6 +728,21 @@ void Fotokite::positionControl(double targetTetherLength, double targetElevation
  */
 void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, double thetaX, double thetaY, double thetaZ, double contactPointX, double contactPointY, double contactPointZ) {
 
+    updateContactPoints(contactPointX, contactPointY, contactPointZ);
+    
+    // Print stack for debugging
+//    ContactPoint cp = contactPoints.top();
+//    cout << cp.x << " " << cp.y << " " << cp.z << " " << cp.segmentTetherLength << " " << cp.totalTetherLength << endl;
+//    if (contactPoints.size() > 1) {
+//        contactPoints.pop();
+//        ContactPoint cp2 = contactPoints.top();
+//        cout << cp2.x << " " << cp2.y << " " << cp2.z << " " << cp2.segmentTetherLength << " " << cp2.totalTetherLength << endl;
+//        contactPoints.push(cp);
+//    }
+//    cout << endl;
+//    
+//    return;
+
     // Waypoint acceptance radius (0.4 m is approximate position error of Fotokite)
     double waypointAcceptanceRadius = 0.4;
 
@@ -587,21 +751,32 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
     double targetElevation;
     double targetAzimuth;
 
-//    if (contactPointX == 0 && contactPointY == 0 && contactPointZ == 0) { // TODO remove this
-//
-//        // Tether is not touching any obstacle
-//        targetTetherLength = sqrt(targetX * targetX + targetY * targetY + targetZ * targetZ);
-//        targetElevation = asin(targetY / targetTetherLength);
-//        targetAzimuth = atan2(targetX, targetZ) - PI / 2;
-//
-//    } else {
+    //    if (contactPointX == 0 && contactPointY == 0 && contactPointZ == 0) { // TODO remove this
+    //
+    //        // Tether is not touching any obstacle
+    //        targetTetherLength = sqrt(targetX * targetX + targetY * targetY + targetZ * targetZ);
+    //        targetElevation = asin(targetY / targetTetherLength);
+    //        targetAzimuth = atan2(targetX, targetZ) - PI / 2;
+    //
+    //    } else {
 
-        // Tether is touching an obstacle at contact point
-        targetAzimuth = atan2(-(targetZ - contactPointZ), targetX - contactPointX);
-        targetElevation = asin((targetY - contactPointY) / (sqrt(pow(targetX - contactPointX, 2) + pow(targetY - contactPointY, 2) + pow(targetZ - contactPointZ, 2))));
-        targetTetherLength = sqrt(pow(contactPointX, 2) + pow(contactPointY, 2) + pow(contactPointZ, 2)) + sqrt(pow(targetX - contactPointX, 2) + pow(targetY - contactPointY, 2) + pow(targetZ - contactPointZ, 2));
+    // Tether is touching an obstacle at contact point
+    targetAzimuth = atan2(-(targetZ - contactPointZ), targetX - contactPointX);
+    targetElevation = asin((targetY - contactPointY) / (sqrt(pow(targetX - contactPointX, 2) + pow(targetY - contactPointY, 2) + pow(targetZ - contactPointZ, 2))));
+    targetTetherLength = contactPoints.top().totalTetherLength + sqrt(pow(targetX - contactPointX, 2) + pow(targetY - contactPointY, 2) + pow(targetZ - contactPointZ, 2));
 
-//    }
+    //    }
+    
+    // Fotokite can only reach elevation angle of 0.5, so ignore all the waypoints bellow 0.5 elevation angle
+    if (targetElevation < 0.5) {
+        
+        // Print waypoint abandoned
+        cout << "Waypoint " << targetX << " " << targetY << " " << targetZ << " abandoned (too low)." << endl;
+        
+        // Return
+        return;
+        
+    }
 
     // Was waypoint reached
     bool waypointReached = false;
@@ -633,7 +808,7 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
     while (!waypointReached) {
 
         // Current tether, elevation, and azimuth
-        currentTetherLength = getScaledTetherLenght();
+        currentTetherLength = getScaledTetherLength();
         currentElevation = 1.57 - getElevation();
         currentAzimuth = getRelAzimuth();
 
@@ -652,9 +827,9 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
         }
 
         // Current x, y, z
-        currentX = currentTetherLength * cos(currentElevation) * cos(currentAzimuth);
-        currentY = currentTetherLength * sin(currentElevation);
-        currentZ = -currentTetherLength * cos(currentElevation) * sin(currentAzimuth);
+        currentX = (currentTetherLength - contactPoints.top().totalTetherLength) * cos(currentElevation) * cos(currentAzimuth) + contactPointX;
+        currentY = (currentTetherLength - contactPoints.top().totalTetherLength) * sin(currentElevation) + contactPointY;
+        currentZ = -(currentTetherLength - contactPoints.top().totalTetherLength) * cos(currentElevation) * sin(currentAzimuth) + contactPointZ;
 
 #ifdef VELOCITY_CONTROL
         velocityControl(targetX, targetY, targetZ, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ);
@@ -669,15 +844,63 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
         waypointReached = waypointDistance < waypointAcceptanceRadius;
 
         // Log
-        log(targetX, targetY, targetZ, targetTetherLength, targetElevation, targetAzimuth, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ, tetherRate, elevationRate, azimuthRate, waypointAcceptanceRadius, waypointDistance, waypointReached);
+        log(targetX, targetY, targetZ, targetTetherLength, targetElevation, targetAzimuth, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ, contactPointX, contactPointY, contactPointZ, tetherRate, elevationRate, azimuthRate, waypointAcceptanceRadius, waypointDistance, waypointReached);
 
         // Print debugging information to console
-        cout << targetTetherLength << " " << currentTetherLength << " | " << targetElevation << " " << currentElevation << " | " << targetAzimuth << " " << currentAzimuth << " | " << waypointDistance << endl;       
+        cout << targetTetherLength << " " << currentTetherLength << " | " << targetElevation << " " << currentElevation << " | " << targetAzimuth << " " << currentAzimuth << " | " << waypointDistance << " | " << contactPointX << " " << contactPointY << " " << contactPointZ << " | " << contactPoints.top().totalTetherLength << endl;
         //cout << currentElevation << " " << currentAzimuth << endl;      
     }
 
     // Print waypoint reached
     cout << "Waypoint " << targetX << " " << targetY << " " << targetZ << " reached." << endl;
+}
+
+/**
+ * Scale waypoints as planner coordinates are in obstacle units.
+ * 
+ * @param x
+ * @param y
+ * @param z
+ * @param contactPointX
+ * @param contactPointY
+ * @param contactPointZ
+ * @param scale
+ */
+void Fotokite::scaleCoordinates(double& x, double& y, double& z, double& contactPointX, double& contactPointY, double& contactPointZ, double scale) {
+
+    // To convert coordinates to meters (used by Fotokite), multiply each coordinate by scale.
+    x *= scale;
+    y *= scale;
+    z *= scale;
+    contactPointX *= scale;
+    contactPointY *= scale;
+    contactPointZ *= scale;
+
+}
+
+/**
+ * Rearrange the planner coordinates to correspond to Fotokite coordinates.
+ * 
+ * @param x
+ * @param y
+ * @param z
+ * @param contactPointX
+ * @param contactPointY
+ * @param contactPointZ
+ */
+void Fotokite::rearrangeCoordinates(double& x, double& y, double& z, double& contactPointX, double& contactPointY, double& contactPointZ) {
+    double oldX = x;
+    double oldY = y;
+    double oldZ = z;
+    x = oldY;
+    y = oldZ;
+    z = oldX;
+    double oldContactPointX = contactPointX;
+    double oldContactPointY = contactPointY;
+    double oldContactPointZ = contactPointZ;
+    contactPointX = oldContactPointY;
+    contactPointY = oldContactPointZ;
+    contactPointZ = oldContactPointX;
 }
 
 /**
@@ -687,7 +910,7 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
  * @param fileName Name of waypoint file
  */
 void Fotokite::executePath(string fileName) {
-
+    
     // Waypoint file
     ifstream file(fileName);
 
@@ -725,40 +948,23 @@ void Fotokite::executePath(string fileName) {
             line = line.substr(nextCharacterPosition);
             double contactPointZ = stod(line, &nextCharacterPosition);
 
-            // Print target waypoint
-            cout << "Going to waypoint " << x << " " << y << " " << z << " with contact point " << contactPointX << " " << contactPointY << " " << contactPointZ << "." << endl;
+            // Scale planner coordinates (obstacle units) to Fotokite coordinates (meters). One planner unit is 33 cm.
+            scaleCoordinates(x, y, z, contactPointX, contactPointY, contactPointZ, 0.33);
 
-            // Scale waypoints as the planner coordinates are in obstacle units (1 unit is 33 cm). To convert to meters, multiply by 0.33.
-            double scale = 0.33;
-            x *= scale;
-            y *= scale;
-            z *= scale;
-            contactPointX *= scale;
-            contactPointY *= scale;
-            contactPointZ *= scale;
-            
-            // Modify the coordinates to correspond to the coordinates used in the palanner
-            double oldX = x;
-            double oldY = y;
-            double oldZ = z;      
-            x = oldY;
-            y = oldZ;
-            z = oldX;
-            double oldContactPointX = contactPointX;
-            double oldContactPointY = contactPointY;
-            double oldContactPointZ = contactPointZ;      
-            contactPointX = oldContactPointY;
-            contactPointY = oldContactPointZ;
-            contactPointZ = oldContactPointX;
-            
-            // Shift entire path up to prevent beeing too close to the ground (TODO fix this)
-            double offset = 1;
-            y += offset;
-//            contactPointY += offset; // TODO offset to contact point
-            
+            // Rearrange the planner coordinates to correspond to Fotokite coordinates
+            rearrangeCoordinates(x, y, z, contactPointX, contactPointY, contactPointZ);
+
+            // Shift the entire path up to prevent beeing too close to the ground as Fotokite has lower limit on elevation angle (TODO fix this)
+            //            double offset = 1;
+            //            y += offset;
+            //            contactPointY += offset; // TODO offset to contact point
+
+            // Print target waypoint
+//            cout << "Going to waypoint " << x << " " << y << " " << z << " with contact point " << contactPointX << " " << contactPointY << " " << contactPointZ << "." << endl;
+
             // Go to waypoint
             goToWaypoint(x, y, z, 0, 0, 0, contactPointX, contactPointY, contactPointZ);
-
+            
         }
 
         // Close waypoint file
@@ -774,7 +980,32 @@ void Fotokite::executePath(string fileName) {
 
 }
 
-void Fotokite::log(double targetX, double targetY, double targetZ, double targetTetherLength, double targetElevation, double targetAzimuth, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ, double tetherRate, double elevationRate, double azimuthRate, double waypointAcceptanceRadius, double waypointDistance, double waypointReached) {
+/**
+ * Log data.
+ * 
+ * @param targetX
+ * @param targetY
+ * @param targetZ
+ * @param targetTetherLength
+ * @param targetElevation
+ * @param targetAzimuth
+ * @param currentTetherLength
+ * @param currentElevation
+ * @param currentAzimuth
+ * @param currentX
+ * @param currentY
+ * @param currentZ
+ * @param contactPointX
+ * @param contactPointY
+ * @param contactPointZ
+ * @param tetherRate
+ * @param elevationRate
+ * @param azimuthRate
+ * @param waypointAcceptanceRadius
+ * @param waypointDistance
+ * @param waypointReached
+ */
+void Fotokite::log(double targetX, double targetY, double targetZ, double targetTetherLength, double targetElevation, double targetAzimuth, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ, double contactPointX, double contactPointY, double contactPointZ, double tetherRate, double elevationRate, double azimuthRate, double waypointAcceptanceRadius, double waypointDistance, double waypointReached) {
 
     // Log time
     logFile << getCurrentTime();
@@ -788,7 +1019,7 @@ void Fotokite::log(double targetX, double targetY, double targetZ, double target
 
     logFile << targetZ;
     logFile << " ";
-    
+
     logFile << currentX;
     logFile << " ";
 
@@ -814,6 +1045,15 @@ void Fotokite::log(double targetX, double targetY, double targetZ, double target
     logFile << " ";
 
     logFile << currentAzimuth;
+    logFile << " ";
+    
+    logFile << contactPointX;
+    logFile << " ";
+
+    logFile << contactPointY;
+    logFile << " ";
+
+    logFile << contactPointZ;
     logFile << " ";
 
     logFile << tetherRate;

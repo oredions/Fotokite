@@ -1,5 +1,15 @@
+/* 
+ * File:   main.cpp
+ * Author: Jan Dufek
+ * 
+ * Created on April 26, 2017, 6:39 PM
+ */
+
 #include "Fotokite.hpp" 
 
+/**
+ * This main function contains example usage of the library.
+ */
 int main(int argc, char *argv[]) {
 
     // Initialize Fotokite interface for OCU server

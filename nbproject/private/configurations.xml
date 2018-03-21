@@ -24,6 +24,8 @@
       </df>
       <in>Communication.cpp</in>
       <in>Communication.hpp</in>
+      <in>ContactPoint.cpp</in>
+      <in>ContactPoint.hpp</in>
       <in>Fotokite.cpp</in>
       <in>Fotokite.hpp</in>
       <in>FotokiteState.cpp</in>
