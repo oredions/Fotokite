@@ -165,6 +165,79 @@ double Fotokite::getQW() {
 }
 
 /**
+ * Get yaw angle of the orientation of the vehicle with respect to its initialization frame. Yaw is z-axis rotation.
+ * 
+ * @return Yaw
+ */
+double Fotokite::getYaw() {
+    
+    double QX = this->getQX();
+    double QY = this->getQY();
+    double QZ = this->getQZ();
+    double QW = this->getQW();
+    
+    double sinY = 2.0 * (QW * QZ + QX * QY);
+    double cosY = 1.0 - 2.0 * (QY * QY + QZ * QZ);
+    
+    double yaw = atan2(sinY, cosY);
+    
+    return yaw;
+    
+}
+
+/**
+ * Get pitch angle of the orientation of the vehicle with respect to its initialization frame. Pitch is y-axis rotation.
+ * 
+ * @return Pitch
+ */
+double Fotokite::getPitch() {
+    
+    double QX = this->getQX();
+    double QY = this->getQY();
+    double QZ = this->getQZ();
+    double QW = this->getQW();
+    
+    double sinP = 2.0 * (QW * QY - QZ * QX);
+    
+    double pitch;
+    
+    if (fabs(sinP) >= 1) {
+        
+                // Use 90 degrees if out of range
+		pitch = copysign(M_PI / 2, sinP);
+                
+    } else {
+        
+		pitch = asin(sinP);
+                
+    }
+    
+    return pitch;
+    
+}
+
+/**
+ * Get roll angle of the orientation of the vehicle with respect to its initialization frame. Roll is x-axis rotation.
+ * 
+ * @return Roll
+ */
+double Fotokite::getRoll() {
+    
+    double QX = this->getQX();
+    double QY = this->getQY();
+    double QZ = this->getQZ();
+    double QW = this->getQW();
+    
+    double sinR = 2.0 * (QW * QX + QY * QZ);
+    double cosR = 1.0 - 2.0 * (QX * QX + QY * QY);
+    
+    double roll = atan2(sinR, cosR);
+    
+    return roll;
+    
+}
+
+/**
  * Vertical angle of tether in radians where 0 is aligned with gravity.
  * 
  * @return 

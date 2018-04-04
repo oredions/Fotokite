@@ -45,6 +45,11 @@ public:
     double getQY();
     double getQZ();
     double getQW();
+    
+    // Orientation getters
+    double getYaw();
+    double getPitch();
+    double getRoll();
 
     // Position getters
     double getElevation();
