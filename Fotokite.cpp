@@ -11,6 +11,10 @@
 #include <string>
 
 #define PI 3.14159265
+#define g 9.80665
+
+// Uncomment if you want to correct the elevation angle for tether arc created by gravity
+#define CORRECT_ELEVATION_ANGLE
 
 // Switch between position control and velocity control. Comment if you want position control. Uncomment if you want velocity control.
 //#define VELOCITY_CONTROL
@@ -165,24 +169,26 @@ double Fotokite::getQW() {
 }
 
 /**
- * Get yaw angle of the orientation of the vehicle with respect to its initialization frame. Yaw is z-axis rotation.
+ * Get yaw angle of the orientation of the vehicle with respect to its
+ * initialization frame. Yaw is z-axis rotation.
+ * Link: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_Angles_Conversion
  * 
  * @return Yaw
  */
 double Fotokite::getYaw() {
-    
+
     double QX = this->getQX();
     double QY = this->getQY();
     double QZ = this->getQZ();
     double QW = this->getQW();
-    
+
     double sinY = 2.0 * (QW * QZ + QX * QY);
     double cosY = 1.0 - 2.0 * (QY * QY + QZ * QZ);
-    
+
     double yaw = atan2(sinY, cosY);
-    
+
     return yaw;
-    
+
 }
 
 /**
@@ -191,29 +197,29 @@ double Fotokite::getYaw() {
  * @return Pitch
  */
 double Fotokite::getPitch() {
-    
+
     double QX = this->getQX();
     double QY = this->getQY();
     double QZ = this->getQZ();
     double QW = this->getQW();
-    
+
     double sinP = 2.0 * (QW * QY - QZ * QX);
-    
+
     double pitch;
-    
+
     if (fabs(sinP) >= 1) {
-        
-                // Use 90 degrees if out of range
-		pitch = copysign(M_PI / 2, sinP);
-                
+
+        // Use 90 degrees if out of range
+        pitch = copysign(M_PI / 2, sinP);
+
     } else {
-        
-		pitch = asin(sinP);
-                
+
+        pitch = asin(sinP);
+
     }
-    
+
     return pitch;
-    
+
 }
 
 /**
@@ -222,28 +228,48 @@ double Fotokite::getPitch() {
  * @return Roll
  */
 double Fotokite::getRoll() {
-    
+
     double QX = this->getQX();
     double QY = this->getQY();
     double QZ = this->getQZ();
     double QW = this->getQW();
-    
+
     double sinR = 2.0 * (QW * QX + QY * QZ);
     double cosR = 1.0 - 2.0 * (QX * QX + QY * QY);
-    
+
     double roll = atan2(sinR, cosR);
-    
+
     return roll;
-    
+
 }
 
 /**
  * Vertical angle of tether in radians where 0 is aligned with gravity.
  * 
- * @return 
+ * @return elevation angle
  */
 double Fotokite::getElevation() {
     return state->elevation;
+}
+
+/**
+ * Get elevation angle corrected for gravity of the tether.
+ * 
+ * This provides more precise elevation angle and enables to get more precise
+ * cartesian coordinates.
+ * 
+ * @return elevation angle corrected for tether gravity
+ */
+double Fotokite::getCorrectedElevation() {
+
+    // Get sensed elevation
+    double sensedElevation = 1.57 - getElevation();
+
+    double nominator = cosh(std::log(tan(sensedElevation) + sqrt(pow(tan(sensedElevation), 2) + 1))) - cosh(0);
+    double denominator = std::log(tan(sensedElevation) + sqrt(pow(tan(sensedElevation), 2) + 1));
+
+    return atan(nominator / denominator);
+
 }
 
 /**
@@ -494,8 +520,11 @@ void Fotokite::printState() {
  */
 double Fotokite::getScaledTetherLength() {
 
-    // Tether unit transform. 100 ticks is 0.406 m. Therefore, 1 tick is 0.406/100 m.
-    double tetherScale = 0.406 / 100;
+    // Tether unit transform. 100 ticks is 0.406 m (measured using 1 experiment while sending 100 ticks one times). Therefore, 1 tick is 0.406/100 m.
+    //double tetherScale = 0.406 / 100;
+
+    // Tether unit transform. 1000 ticks is 2.85 m (measured using 5 experiments while sending 100 ticks ten times). Therefore, 1 tick is 2.85/1000 m.
+    double tetherScale = 0.00285;
 
     return Fotokite::getRelTetherLength() * tetherScale;
 
@@ -551,7 +580,17 @@ double Fotokite::tetherControl(double targetTetherLength, double tolerance) {
 double Fotokite::elevationControl(double targetElevation, double tolerance) {
 
     // Current elevation
+#ifdef CORRECT_ELEVATION_ANGLE
+
+    // Get elevation angle corrected for tether arc caused by gravity
+    double currentElevation = getCorrectedElevation();
+    
+#else
+
+    // Get uncorrected elevation as read by the Fotokite's sensor
     double currentElevation = 1.57 - getElevation();
+
+#endif
 
     // Gain of P element of PID
     double pGain = 0.25;
@@ -691,20 +730,20 @@ void Fotokite::positionControl(double targetTetherLength, double targetElevation
  * @return static tether length
  */
 struct Fotokite::TetherLength Fotokite::computeStaticTetherLength(double newContactPointX, double newContactPointY, double newContactPointZ) {
-    
+
     if (contactPoints.empty()) {
-        
+
         // There are no contact points
         TetherLength tetherLength;
         tetherLength.segment = 0;
         tetherLength.total = 0;
         return tetherLength;
-        
+
     } else {
-        
+
         // Get last contact point
         ContactPoint lastContactPoint = contactPoints.top();
-        
+
         // Compute segment length and total length
         double newSegmentTetherLength = sqrt(pow(newContactPointX - lastContactPoint.x, 2) + pow(newContactPointY - lastContactPoint.y, 2) + pow(newContactPointZ - lastContactPoint.z, 2));
         double newTotalTetherLength = lastContactPoint.totalTetherLength + newSegmentTetherLength;
@@ -713,10 +752,94 @@ struct Fotokite::TetherLength Fotokite::computeStaticTetherLength(double newCont
         tetherLength.segment = newSegmentTetherLength;
         tetherLength.total = newTotalTetherLength;
         return tetherLength;
-        
+
     }
-    
+
 }
+
+///**
+// * Get lean angle of airframe. The lean angle is angle of the airframe relative 
+// * to the horizontal frame. If the airframes , it is the angle between that plane and the horizontal plane.
+// * 
+// * @return 
+// */
+//double Fotokite::getLeanAngle() {
+//
+//    // Get quaternion (it is normalized). Quaternion uses Tait–Bryan coordinate system.
+//    double q1 = this->getQX();
+//    double q2 = this->getQY();
+//    double q3 = this->getQZ();
+//    double q0 = this->getQW();
+//
+//    // Used the Fotokite SDK's coordinate system which is Tait–Bryan. Link: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Rotation_matrices
+//    Mat R = (Mat_<double>(3, 3) <<
+//            1 - 2 * (pow(q2, 2) + pow(q3, 2)), 2 * (q1 * q2 - q0 * q3), 2 * (q0 * q2 + q1 * q3),
+//            2 * (q1 * q2 + q0 * q3), 1 - 2 * (pow(q1, 2) + pow(q3, 2)), 2 * (q2 * q3 - q0 * q1),
+//            2 * (q1 * q3 - q0 * q2), 2 * (q0 * q1 + q2 * q3), 1 - 2 * (pow(q1, 2) + pow(q2, 2)));
+//
+//    // Vector pointing up
+//    Mat n_v = (Mat_<double>(3, 1) <<
+//            0,
+//            0,
+//            1);
+//
+//    Mat n_g = R * n_v;
+//
+//    double x_g = n_g.at<double>(0, 0);
+//    double y_g = n_g.at<double>(1, 0);
+//    double z_g = n_g.at<double>(2, 0);
+//
+//    //    cout << "x_g: " << x_g << " | y_g: " << y_g << " | z_g:" << z_g << endl;
+//
+//    double leanAngle = asin(z_g / sqrt(pow(x_g, 2) + pow(y_g, 2) + pow(z_g, 2)));
+//
+//    //    cout << leanAngle / PI * 180 << endl;
+//
+//    return leanAngle;
+//
+//}
+//
+//double Fotokite::getTetherTension() {
+//
+//    // See the paper for the symbol definitions
+//
+//    double beta = getLeanAngle();
+//    double theta = 1.57 - getElevation();
+//
+//    double G = airframeWeight * g;
+//
+//    double T = (G * cos(beta)) / (sin(beta) * cos(theta) - tan(theta) * cos(theta) * cos(beta));
+//
+//
+//    double F = G / (sin(beta) - tan(theta) * cos(beta));
+//    //cout << "T: " << T << " | F: " << F << " | b:" << beta / PI * 180 << endl;
+//
+//    return T;
+//
+//}
+//
+//void Fotokite::updateTetherEndpoint() {
+//
+//    double T_1 = getTetherTension();
+//    double beta = 1.57 - getElevation();
+//    double rho = tetherLinearDensity;
+//
+//    double deltaX = ((T_1 * cos(beta)) / (rho * g)) * std::log(tan(beta) + sqrt(pow(tan(beta), 2) + 1));
+//
+//    double T_0 = T_1 * cos(beta);
+//
+//    double a = T_0 / (0.0061 * g);
+//
+//    double deltaY = a * cosh(deltaX / a);
+//
+//    tetherEndpointX = deltaX;
+//    tetherEndpointY = deltaY;
+//
+//    //cout << T_1 << " | " << tetherEndpointX << " | " << tetherEndpointY << endl;
+//
+//    //cout << "Y/X = " << atan(tetherEndpointY/tetherEndpointX) / PI * 180 << " | Beta = " << beta / PI * 180 << endl;
+//
+//}
 
 /**
  * Add new contact point to the list of all active contact points.
@@ -726,16 +849,16 @@ struct Fotokite::TetherLength Fotokite::computeStaticTetherLength(double newCont
  * @param newContactPointZ
  */
 void Fotokite::addContactPoint(double newContactPointX, double newContactPointY, double newContactPointZ) {
-    
+
     // Compute static tether length
-    TetherLength tetherLength = computeStaticTetherLength(newContactPointX, newContactPointY, newContactPointZ);  
-    
+    TetherLength tetherLength = computeStaticTetherLength(newContactPointX, newContactPointY, newContactPointZ);
+
     // Initialize new contact point
     ContactPoint newContactPoint = ContactPoint(newContactPointX, newContactPointY, newContactPointZ, tetherLength.segment, tetherLength.total);
 
     // Push it on the stack
     contactPoints.push(newContactPoint);
-    
+
 }
 
 /**
@@ -750,9 +873,9 @@ void Fotokite::updateContactPoints(double newContactPointX, double newContactPoi
 
     // Stack is empty
     if (contactPoints.empty()) {
-        
+
         addContactPoint(newContactPointX, newContactPointY, newContactPointZ);
-                
+
         return;
 
     }
@@ -802,19 +925,19 @@ void Fotokite::updateContactPoints(double newContactPointX, double newContactPoi
 void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, double thetaX, double thetaY, double thetaZ, double contactPointX, double contactPointY, double contactPointZ) {
 
     updateContactPoints(contactPointX, contactPointY, contactPointZ);
-    
+
     // Print stack for debugging
-//    ContactPoint cp = contactPoints.top();
-//    cout << cp.x << " " << cp.y << " " << cp.z << " " << cp.segmentTetherLength << " " << cp.totalTetherLength << endl;
-//    if (contactPoints.size() > 1) {
-//        contactPoints.pop();
-//        ContactPoint cp2 = contactPoints.top();
-//        cout << cp2.x << " " << cp2.y << " " << cp2.z << " " << cp2.segmentTetherLength << " " << cp2.totalTetherLength << endl;
-//        contactPoints.push(cp);
-//    }
-//    cout << endl;
-//    
-//    return;
+    //    ContactPoint cp = contactPoints.top();
+    //    cout << cp.x << " " << cp.y << " " << cp.z << " " << cp.segmentTetherLength << " " << cp.totalTetherLength << endl;
+    //    if (contactPoints.size() > 1) {
+    //        contactPoints.pop();
+    //        ContactPoint cp2 = contactPoints.top();
+    //        cout << cp2.x << " " << cp2.y << " " << cp2.z << " " << cp2.segmentTetherLength << " " << cp2.totalTetherLength << endl;
+    //        contactPoints.push(cp);
+    //    }
+    //    cout << endl;
+    //    
+    //    return;
 
     // Waypoint acceptance radius (0.4 m is approximate position error of Fotokite)
     double waypointAcceptanceRadius = 0.4;
@@ -839,17 +962,17 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
     targetTetherLength = contactPoints.top().totalTetherLength + sqrt(pow(targetX - contactPointX, 2) + pow(targetY - contactPointY, 2) + pow(targetZ - contactPointZ, 2));
 
     //    }
-    
+
     // Fotokite can only reach elevation angle of 0.5, so ignore all the waypoints bellow 0.5 elevation angle
-    if (targetElevation < 0.5) {
-        
-        // Print waypoint abandoned
-        cout << "Waypoint " << targetX << " " << targetY << " " << targetZ << " abandoned (too low)." << endl;
-        
-        // Return
-        return;
-        
-    }
+    //    if (targetElevation < 0.5) {
+    //        
+    //        // Print waypoint abandoned
+    //        cout << "Waypoint " << targetX << " " << targetY << " " << targetZ << " abandoned (too low)." << endl;
+    //        
+    //        // Return
+    //        return;
+    //        
+    //    }
 
     // Was waypoint reached
     bool waypointReached = false;
@@ -880,10 +1003,27 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
     // While waypoint is not reached
     while (!waypointReached) {
 
-        // Current tether, elevation, and azimuth
+//        // Update tether endpoint
+//        updateTetherEndpoint();
+
+        // Current tether
         currentTetherLength = getScaledTetherLength();
-        currentElevation = 1.57 - getElevation();
+        
+        // Current azimuth
         currentAzimuth = getRelAzimuth();
+        
+    // Current elevation
+#ifdef CORRECT_ELEVATION_ANGLE
+
+    // Get elevation angle corrected for tether arc caused by gravity
+    currentElevation = getCorrectedElevation();
+    
+#else
+
+    // Get uncorrected elevation as read by the Fotokite's sensor
+    currentElevation = 1.57 - getElevation();
+
+#endif
 
         // Correct target azimuth. 180° and -180° is the same. Therefore, if the difference is too high, bring it back.
         if (abs(currentAzimuth - targetAzimuth) > PI) {
@@ -905,22 +1045,26 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
         currentZ = -(currentTetherLength - contactPoints.top().totalTetherLength) * cos(currentElevation) * sin(currentAzimuth) + contactPointZ;
 
 #ifdef VELOCITY_CONTROL
+        
         velocityControl(targetX, targetY, targetZ, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ);
+        
 #else
+        
         positionControl(targetTetherLength, targetElevation, targetAzimuth, tetherTolerance, ElevationTolerance, azimuthTolerance, tetherRate, elevationRate, azimuthRate);
+        
 #endif
 
         // Distance to waypoint
         waypointDistance = sqrt(pow(currentX - targetX, 2) + pow(currentY - targetY, 2) + pow(currentZ - targetZ, 2));
 
         // Check if waypoint was reached
-        waypointReached = waypointDistance < waypointAcceptanceRadius;
+        //        waypointReached = waypointDistance < waypointAcceptanceRadius;
 
         // Log
         log(targetX, targetY, targetZ, targetTetherLength, targetElevation, targetAzimuth, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ, contactPointX, contactPointY, contactPointZ, tetherRate, elevationRate, azimuthRate, waypointAcceptanceRadius, waypointDistance, waypointReached);
 
         // Print debugging information to console
-        cout << targetTetherLength << " " << currentTetherLength << " | " << targetElevation << " " << currentElevation << " | " << targetAzimuth << " " << currentAzimuth << " | " << waypointDistance << " | " << contactPointX << " " << contactPointY << " " << contactPointZ << " | " << contactPoints.top().totalTetherLength << endl;
+        cout << targetTetherLength << " " << currentTetherLength << " | " << targetElevation << " " << currentElevation << " " << 1.57 - getElevation() << " | " << targetAzimuth << " " << currentAzimuth << " | " << waypointDistance << " | " << contactPointX << " " << contactPointY << " " << contactPointZ << " | " << contactPoints.top().totalTetherLength << endl;
         //cout << currentElevation << " " << currentAzimuth << endl;      
     }
 
@@ -983,7 +1127,7 @@ void Fotokite::rearrangeCoordinates(double& x, double& y, double& z, double& con
  * @param fileName Name of waypoint file
  */
 void Fotokite::executePath(string fileName) {
-    
+
     // Waypoint file
     ifstream file(fileName);
 
@@ -1033,11 +1177,11 @@ void Fotokite::executePath(string fileName) {
             //            contactPointY += offset; // TODO offset to contact point
 
             // Print target waypoint
-//            cout << "Going to waypoint " << x << " " << y << " " << z << " with contact point " << contactPointX << " " << contactPointY << " " << contactPointZ << "." << endl;
+            //            cout << "Going to waypoint " << x << " " << y << " " << z << " with contact point " << contactPointX << " " << contactPointY << " " << contactPointZ << "." << endl;
 
             // Go to waypoint
             goToWaypoint(x, y, z, 0, 0, 0, contactPointX, contactPointY, contactPointZ);
-            
+
         }
 
         // Close waypoint file
@@ -1119,7 +1263,7 @@ void Fotokite::log(double targetX, double targetY, double targetZ, double target
 
     logFile << currentAzimuth;
     logFile << " ";
-    
+
     logFile << contactPointX;
     logFile << " ";
 

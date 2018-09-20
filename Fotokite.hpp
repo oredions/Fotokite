@@ -129,6 +129,19 @@ private:
     double elevationControl(double, double);
     double azimuthControl(double, double);
 
+    // Corrected elevation
+    double getCorrectedElevation();
+//    void updateTetherEndpoint();
+//    double getTetherTension();
+//    double getLeanAngle();
+//    
+//    double tetherEndpointX;
+//    double tetherEndpointY;
+//    
+//    // Physical properties
+//    double tetherLinearDensity = 0.0061; // kg / m
+//    double airframeWeight = 0.618; // kg
+//    
 };
 
 #endif /* FOTOKITE_HPP */

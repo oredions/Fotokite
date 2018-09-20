@@ -57,10 +57,10 @@ void FotokiteState::updateSingle(string message) {
     } else if (header.compare("!Attitude") == 0) {
 
         // Attitude message
+        this->QW = stod(nextToken(&message, ","));
         this->QX = stod(nextToken(&message, ","));
         this->QY = stod(nextToken(&message, ","));
         this->QZ = stod(nextToken(&message, ","));
-        this->QW = stod(nextToken(&message, ","));
 
     } else if (header.compare("!Pos") == 0) {
 
