@@ -14,10 +14,10 @@
 #define g 9.80665
 
 // Uncomment if you want to correct the elevation angle for tether arc created by gravity
-#define CORRECT_ELEVATION_ANGLE
+//#define CORRECT_ELEVATION_ANGLE
 
 // Switch between position control and velocity control. Comment if you want position control. Uncomment if you want velocity control.
-//#define VELOCITY_CONTROL
+#define VELOCITY_CONTROL
 
 /**
  * Initialize wireless communication with the Fotokite server.
@@ -35,6 +35,9 @@ Fotokite::Fotokite(const char * ip_address, const short port) {
 
     // Initialize log
     logFile.open("log/" + getCurrentTime() + ".txt");
+
+    // Wait for all the messages to be initialized to make sure Fotokite status makes sense
+    while (!(state->NEW_GSSSTATUS_MESSAGE && state->NEW_ATTITUDE_MESSAGE && state->NEW_GIMBAL_MESSAGE && state->NEW_POS_MESSAGE && state->NEW_FLIGHTSTATUS_MESSAGE));
 
 }
 
@@ -54,6 +57,9 @@ Fotokite::Fotokite(const char * serialPort) {
     // Initialize log
     logFile.open("log/" + getCurrentTime() + ".txt");
 
+    // Wait for all the messages to be initialized to make sure Fotokite status makes sense
+    while (!(state->NEW_GSSSTATUS_MESSAGE && state->NEW_ATTITUDE_MESSAGE && state->NEW_GIMBAL_MESSAGE && state->NEW_POS_MESSAGE && state->NEW_FLIGHTSTATUS_MESSAGE));
+
 }
 
 Fotokite::Fotokite(const Fotokite& orig) {
@@ -64,16 +70,26 @@ Fotokite::Fotokite(const Fotokite& orig) {
  */
 Fotokite::~Fotokite() {
 
+    // Sleep to make sure the messages get accepted. If you don't sleep, the stop messages might get lost because of the previous messages.
+    usleep(500000);
+
     // Stop motion
-    this->gimbal(0, 0);
-    this->pos(0, 0, 0);
-    this->yaw(0);
+    stop();
 
     // Delete communication
     delete communication;
 
     // Close log
     logFile.close();
+
+}
+
+void Fotokite::stop() {
+
+    // Stop motion
+    gimbal(0, 0);
+    pos(0, 0, 0);
+    yaw(0);
 
 }
 
@@ -133,7 +149,7 @@ double Fotokite::getRelTetherLength() {
 }
 
 /**
- * QX, QY, QZ, QW are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
+ * QW, QX, QY, QZ are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
  * 
  * @return 
  */
@@ -142,7 +158,7 @@ double Fotokite::getQX() {
 }
 
 /**
- * QX, QY, QZ, QW are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
+ * QW, QX, QY, QZ are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
  * 
  * @return 
  */
@@ -151,7 +167,7 @@ double Fotokite::getQY() {
 }
 
 /**
- * QX, QY, QZ, QW are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
+ * QW, QX, QY, QZ are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
  * 
  * @return 
  */
@@ -160,12 +176,52 @@ double Fotokite::getQZ() {
 }
 
 /**
- * QX, QY, QZ, QW are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
+ * QW, QX, QY, QZ are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
  * 
  * @return 
  */
 double Fotokite::getQW() {
     return state->QW;
+}
+
+/**
+ * QW, QX, QY, QZ are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
+ * The initialization frame is an orthogonal Cartesian coordinate system with the z axis aligned to gravity and x axis pointed to the front of the gimbal at initialization.
+ * 
+ * @return 
+ */
+double Fotokite::getGimbalQX() {
+    return state->gimbalQX;
+}
+
+/**
+ * QW, QX, QY, QZ are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
+ * The initialization frame is an orthogonal Cartesian coordinate system with the z axis aligned to gravity and x axis pointed to the front of the gimbal at initialization.
+ * 
+ * @return 
+ */
+double Fotokite::getGimbalQY() {
+    return state->gimbalQY;
+}
+
+/**
+ * QW, QX, QY, QZ are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
+ * The initialization frame is an orthogonal Cartesian coordinate system with the z axis aligned to gravity and x axis pointed to the front of the gimbal at initialization.
+ * 
+ * @return 
+ */
+double Fotokite::getGimbalQZ() {
+    return state->gimbalQZ;
+}
+
+/**
+ * QW, QX, QY, QZ are forming a quaternion representing the orientation of the vehicle with respect to its initialization frame.
+ * The initialization frame is an orthogonal Cartesian coordinate system with the z axis aligned to gravity and x axis pointed to the front of the gimbal at initialization.
+ * 
+ * @return 
+ */
+double Fotokite::getGimbalQW() {
+    return state->gimbalQW;
 }
 
 /**
@@ -233,6 +289,81 @@ double Fotokite::getRoll() {
     double QY = this->getQY();
     double QZ = this->getQZ();
     double QW = this->getQW();
+
+    double sinR = 2.0 * (QW * QX + QY * QZ);
+    double cosR = 1.0 - 2.0 * (QX * QX + QY * QY);
+
+    double roll = atan2(sinR, cosR);
+
+    return roll;
+
+}
+
+/**
+ * Get yaw angle of the orientation of the gimbal with respect to its
+ * initialization frame. Yaw is z-axis rotation.
+ * Link: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_Angles_Conversion
+ * 
+ * @return Yaw
+ */
+double Fotokite::getGimbalYaw() {
+
+    double QX = this->getGimbalQX();
+    double QY = this->getGimbalQY();
+    double QZ = this->getGimbalQZ();
+    double QW = this->getGimbalQW();
+
+    double sinY = 2.0 * (QW * QZ + QX * QY);
+    double cosY = 1.0 - 2.0 * (QY * QY + QZ * QZ);
+
+    double yaw = atan2(sinY, cosY);
+
+    return yaw;
+
+}
+
+/**
+ * Get pitch angle of the orientation of the gimbal with respect to its initialization frame. Pitch is y-axis rotation.
+ * 
+ * @return Pitch
+ */
+double Fotokite::getGimbalPitch() {
+
+    double QX = this->getGimbalQX();
+    double QY = this->getGimbalQY();
+    double QZ = this->getGimbalQZ();
+    double QW = this->getGimbalQW();
+
+    double sinP = 2.0 * (QW * QY - QZ * QX);
+
+    double pitch;
+
+    if (fabs(sinP) >= 1) {
+
+        // Use 90 degrees if out of range
+        pitch = copysign(M_PI / 2.0, sinP);
+
+    } else {
+
+        pitch = asin(sinP);
+
+    }
+
+    return pitch;
+
+}
+
+/**
+ * Get roll angle of the orientation of the gimbal with respect to its initialization frame. Roll is x-axis rotation.
+ * 
+ * @return Roll
+ */
+double Fotokite::getGimbalRoll() {
+
+    double QX = this->getGimbalQX();
+    double QY = this->getGimbalQY();
+    double QZ = this->getGimbalQZ();
+    double QW = this->getGimbalQW();
 
     double sinR = 2.0 * (QW * QX + QY * QZ);
     double cosR = 1.0 - 2.0 * (QX * QX + QY * QY);
@@ -419,7 +550,10 @@ void Fotokite::gimbalPitch(double pitchRate) {
 }
 
 /**
- * Adjust the position of the Flight Unit by commanding a elevation or azimuth angle rate or a change in tether length. Elevation and azimuth are signed floating point values in rad/s. Length is in spool encoder counts.
+ * Adjust the position of the Flight Unit by commanding an elevation or azimuth
+ * angle rate or a change in tether length. Elevation and azimuth are signed
+ * floating point values in rad/s. Length is in spool encoder counts.
+ * Negative tether length is always spool in.
  * 
  * @param elevRate
  * @param azimuthRate
@@ -433,6 +567,32 @@ void Fotokite::pos(double elevRate, double azimuthRate, double lengthDelta) {
 
     // Send command
     sendCommand("Pos " + to_string(elevRate) + "," + to_string(azimuthRate) + "," + to_string(lengthDelta));
+
+}
+
+/**
+ * Adjust the position of the Flight Unit by commanding an elevation angle rate,
+ * an azimuth angle rate, or a tether length velocity. Elevation and azimuth are
+ * signed floating point values in rad/s. Tether length velocity is in
+ * encoder counts/s. With the default ground station parameters, you will not
+ * feel any motor action with tetherLengthVel less than approximately -500.
+ * Negative tether length velocity is always spool in.
+ * 
+ * By experiments with our Fotokite, the minimum for tetherLengthVel is -300.
+ * 
+ * @param elevRate
+ * @param azimuthRate
+ * @param tetherLengthVel
+ */
+void Fotokite::pos2(double elevRate, double azimuthRate, double tetherLengthVel) {
+
+    // Check if the values are legal
+    elevRate = correctInputValues(elevRate, 0.25);
+    azimuthRate = correctInputValues(azimuthRate, 0.2);
+    tetherLengthVel = correctInputValues(tetherLengthVel, 10000);
+
+    // Send command
+    sendCommand("Pos2 " + to_string(elevRate) + "," + to_string(azimuthRate) + "," + to_string(tetherLengthVel));
 
 }
 
@@ -520,13 +680,7 @@ void Fotokite::printState() {
  */
 double Fotokite::getScaledTetherLength() {
 
-    // Tether unit transform. 100 ticks is 0.406 m (measured using 1 experiment while sending 100 ticks one times). Therefore, 1 tick is 0.406/100 m.
-    //double tetherScale = 0.406 / 100;
-
-    // Tether unit transform. 1000 ticks is 2.85 m (measured using 5 experiments while sending 100 ticks ten times). Therefore, 1 tick is 2.85/1000 m.
-    double tetherScale = 0.00285;
-
-    return Fotokite::getRelTetherLength() * tetherScale;
+    return Fotokite::getRelTetherLength() * TETHER_SCALE;
 
 }
 
@@ -584,7 +738,7 @@ double Fotokite::elevationControl(double targetElevation, double tolerance) {
 
     // Get elevation angle corrected for tether arc caused by gravity
     double currentElevation = getCorrectedElevation();
-    
+
 #else
 
     // Get uncorrected elevation as read by the Fotokite's sensor
@@ -660,7 +814,7 @@ double Fotokite::azimuthControl(double targetAzimuth, double tolerance) {
  * @param currentY
  * @param currentZ
  */
-void Fotokite::velocityControl(double x, double y, double z, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ) {
+void Fotokite::velocityControl(double x, double y, double z, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ, double & tetherLengthVelocity, double & elevationRate, double & azimuthRate, double & speed) {
 
     // Compute Jacobian
     Mat jacobian = Mat::zeros(3, 3, CV_64F);
@@ -674,23 +828,58 @@ void Fotokite::velocityControl(double x, double y, double z, double currentTethe
     jacobian.at<double>(2, 1) = currentTetherLength * sin(currentAzimuth) * sin(currentElevation);
     jacobian.at<double>(2, 2) = -currentTetherLength * cos(currentElevation) * cos(currentAzimuth);
 
-    // Velocity vector going from start to target
+    // Velocity vector deltas
+    double deltaX = x - currentX;
+    double deltaY = y - currentY;
+    double deltaZ = z - currentZ;
+
+    // Velocity vector length
+    double velocityVectorLength = sqrt(pow(deltaX, 2) + pow(deltaY, 2) + pow(deltaZ, 2));
+
+    // Velocity unit vector going from start to target
+    Mat velocityUnitVector = Mat::zeros(3, 1, CV_64F);
+    velocityUnitVector.at<double>(0, 0) = deltaX / velocityVectorLength;
+    velocityUnitVector.at<double>(1, 0) = deltaY / velocityVectorLength;
+    velocityUnitVector.at<double>(2, 0) = deltaZ / velocityVectorLength;
+
+    // Desired speed in m/s
+    speed = 0.1;
+
+    // Velocity vector in metric units (m/s)
     Mat velocityVector = Mat::zeros(3, 1, CV_64F);
-    velocityVector.at<double>(0, 0) = x - currentX;
-    velocityVector.at<double>(1, 0) = y - currentY;
-    velocityVector.at<double>(2, 0) = z - currentZ;
+    velocityVector = velocityUnitVector * speed;
 
     // Commands for velocity control
     Mat commands = jacobian.inv() * velocityVector;
 
-    // Gain
-    double gain = 0.5;
-    commands = gain * commands;
+    // Tether length velocity in m/s
+    double tetherLengthVelocityMetric = commands.at<double>(0, 0);
+
+    // Map tether velocity dead zone to active zone by using two linear functions
+    if (tetherLengthVelocityMetric > 0) {
+        
+        tetherLengthVelocity = (tetherLengthVelocityMetric / TETHER_SCALE) + TETHER_NO_MOTION_RATE + (DEAD_ZONE_WIDTH / 2);
+        
+    } else if (tetherLengthVelocityMetric < 0) {
+        
+        tetherLengthVelocity = (tetherLengthVelocityMetric / TETHER_SCALE) + TETHER_NO_MOTION_RATE - (DEAD_ZONE_WIDTH / 2);
+        
+    } else {
+        
+        tetherLengthVelocity = TETHER_NO_MOTION_RATE;
+        
+    }
+
+    // Get control rates for elevation and azimuth
+    elevationRate = commands.at<double>(1, 0);
+    azimuthRate = commands.at<double>(2, 0);
 
     // Send commands
-    posL(commands.at<double>(0, 0));
-    posV(commands.at<double>(1, 0));
-    posH(commands.at<double>(2, 0));
+    pos2(elevationRate, azimuthRate, tetherLengthVelocity);
+
+    // Debugging message
+    //cout << tetherLengthVelocity << " " << elevationRate << " " << azimuthRate << " | " << velocityUnitVector.at<double>(0,0) << " " << velocityUnitVector.at<double>(1,0) << " " << velocityUnitVector.at<double>(2,0) << endl; // << " | " << targetAzimuth << " " << currentAzimuth << " | " << waypointDistance << " | " << contactPointX << " " << contactPointY << " " << contactPointZ << " | " << contactPoints.top().totalTetherLength << endl;
+
 }
 
 /**
@@ -716,6 +905,141 @@ void Fotokite::positionControl(double targetTetherLength, double targetElevation
 
     // Azimuth control
     azimuthRate = azimuthControl(targetAzimuth, azimuthTolerance);
+
+}
+
+bool Fotokite::viewControl(double pointOfInterestX, double pointOfInterestY, double pointOfInterestZ, double currentX, double currentY, double currentZ, double yawTolerance, double gimbalPitchTolerance, double & targetYaw, double & targetGimbalPitch, double & currentYaw, double & currentGimbalPitch, double & yawRate, double & gimbalPitchRate) {
+
+    bool yawReached = yawControl(pointOfInterestX, pointOfInterestZ, currentX, currentZ, yawTolerance, targetYaw, currentYaw, yawRate);
+    bool gimbalPitchReached = gimbalPitchControl(pointOfInterestX, pointOfInterestY, pointOfInterestZ, currentX, currentY, currentZ, gimbalPitchTolerance, targetGimbalPitch, currentGimbalPitch, gimbalPitchRate);
+
+    return yawReached && gimbalPitchReached;
+
+}
+
+bool Fotokite::yawControl(double pointOfInterestX, double pointOfInterestZ, double currentX, double currentZ, double tolerance, double & targetYaw, double & currentYaw, double & yawRate) {
+
+    // Target yaw
+    targetYaw = -atan2(pointOfInterestZ - currentZ, pointOfInterestX - currentX);
+
+    // Current yaw
+    currentYaw = getYaw();
+
+    // Correct target yaw. 180° and -180° is the same. Therefore, if the difference is too high, bring it back.
+    if (abs(currentYaw - targetYaw) > PI) {
+
+        if (currentYaw < targetYaw) {
+
+            targetYaw = targetYaw - 2 * PI;
+
+        } else {
+
+            targetYaw = targetYaw + 2 * PI;
+
+        }
+    }
+
+    // Gain of P element of PID
+    double pGain = 0.2;
+
+    if (abs(targetYaw - currentYaw) > tolerance) {
+
+        // Only do yaw control if we have new attitude message
+        if (state->NEW_ATTITUDE_MESSAGE) {
+
+            yawRate = pGain * (targetYaw - currentYaw);
+
+            yaw(yawRate);
+
+            // Reset new message flag
+            state->NEW_ATTITUDE_MESSAGE = false;
+
+        }
+
+        // Desired yaw not reached yet
+        return false;
+
+    } else {
+
+        // Only do yaw control if we have new attitude message
+        if (state->NEW_ATTITUDE_MESSAGE) {
+
+            yawRate = 0;
+            yaw(yawRate);
+
+            // Reset new message flag
+            state->NEW_ATTITUDE_MESSAGE = false;
+
+        }
+
+        // Desired yaw reached
+        return true;
+
+    }
+
+}
+
+/**
+ * Gimbal pitch control for Fotokite's gimbal.
+ * 
+ * 
+ * @param pointOfInterestX the point Fotokite should look at
+ * @param pointOfInterestY
+ * @param pointOfInterestZ
+ * @param currentX the current Fotokite's position
+ * @param currentY
+ * @param currentZ
+ * @param tolerance controller tolerance
+ */
+bool Fotokite::gimbalPitchControl(double pointOfInterestX, double pointOfInterestY, double pointOfInterestZ, double currentX, double currentY, double currentZ, double tolerance, double & targetPitch, double & currentPitch, double & pitchRate) {
+
+    // Compute the distance to point of interest   
+    double distanceToPointOfInterest = sqrt(pow((currentX - pointOfInterestX), 2) + pow((currentZ - pointOfInterestZ), 2));
+
+    // Target pitch
+    targetPitch = atan((currentY - pointOfInterestY) / distanceToPointOfInterest);
+
+    // Current pitch
+    currentPitch = getGimbalPitch();
+
+    // Gain of P element of PID
+    double pGain = 0.2;
+
+    if (abs(targetPitch - currentPitch) > tolerance) {
+
+        // Only do pitch control if we have new gimbal message
+        if (state->NEW_GIMBAL_MESSAGE) {
+
+            pitchRate = pGain * (targetPitch - currentPitch);
+            gimbalPitch(pitchRate);
+
+            // Reset new message flag
+            state->NEW_GIMBAL_MESSAGE = false;
+
+        }
+
+        // Desired pitch not reached yet
+        return false;
+
+    } else {
+
+        // Only do pitch control if we have new gimbal message
+        if (state->NEW_GIMBAL_MESSAGE) {
+
+            pitchRate = 0;
+            gimbalPitch(pitchRate);
+
+            // Reset new message flag
+            state->NEW_GIMBAL_MESSAGE = false;
+
+        }
+
+        // Desired pitch reached
+        return true;
+
+    }
+
+    cout << (targetPitch / PI * 180) << " " << (currentPitch / PI * 180) << endl;
 
 }
 
@@ -922,7 +1246,7 @@ void Fotokite::updateContactPoints(double newContactPointX, double newContactPoi
  * @param theta_y Not implemented
  * @param theta_z Not implemented
  */
-void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, double thetaX, double thetaY, double thetaZ, double contactPointX, double contactPointY, double contactPointZ) {
+void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, double pointOfInterestX, double pointOfInterestY, double pointOfInterestZ, double contactPointX, double contactPointY, double contactPointZ) {
 
     updateContactPoints(contactPointX, contactPointY, contactPointZ);
 
@@ -977,6 +1301,9 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
     // Was waypoint reached
     bool waypointReached = false;
 
+    // Was desired view reached
+    bool viewReached = false;
+
     // Current tether, elevation, and azimuth
     double currentTetherLength;
     double currentElevation;
@@ -999,31 +1326,43 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
     double tetherRate;
     double elevationRate;
     double azimuthRate;
+    
+    // Control method (position control vs velocity control)
+    bool controlMethod;
+    
+    // The following are passed by reference for logging purposes
+    double speed;
+    double targetYaw;
+    double targetGimbalPitch;
+    double currentYaw;
+    double currentGimbalPitch;
+    double yawRate;
+    double gimbalPitchRate;
 
     // While waypoint is not reached
-    while (!waypointReached) {
+    while (!waypointReached || !viewReached) {
 
-//        // Update tether endpoint
-//        updateTetherEndpoint();
+        //        // Update tether endpoint
+        //        updateTetherEndpoint();
 
         // Current tether
         currentTetherLength = getScaledTetherLength();
-        
+
         // Current azimuth
         currentAzimuth = getRelAzimuth();
-        
-    // Current elevation
-#ifdef CORRECT_ELEVATION_ANGLE
 
-    // Get elevation angle corrected for tether arc caused by gravity
-    currentElevation = getCorrectedElevation();
-    
-#else
+        // Current elevation
+        #ifdef CORRECT_ELEVATION_ANGLE
 
-    // Get uncorrected elevation as read by the Fotokite's sensor
-    currentElevation = 1.57 - getElevation();
+                // Get elevation angle corrected for tether arc caused by gravity
+                currentElevation = getCorrectedElevation();
 
-#endif
+        #else
+
+                // Get uncorrected elevation as read by the Fotokite's sensor
+                currentElevation = 1.57 - getElevation();
+
+        #endif
 
         // Correct target azimuth. 180° and -180° is the same. Therefore, if the difference is too high, bring it back.
         if (abs(currentAzimuth - targetAzimuth) > PI) {
@@ -1044,29 +1383,69 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
         currentY = (currentTetherLength - contactPoints.top().totalTetherLength) * sin(currentElevation) + contactPointY;
         currentZ = -(currentTetherLength - contactPoints.top().totalTetherLength) * cos(currentElevation) * sin(currentAzimuth) + contactPointZ;
 
+        // Do control only if a new pos message is available (otherwise we would just send the same value anyways and it could lead to jerking)
+        if (state->NEW_POS_MESSAGE) {
+
+            // Distance to waypoint
+            waypointDistance = sqrt(pow(currentX - targetX, 2) + pow(currentY - targetY, 2) + pow(currentZ - targetZ, 2));
+
+            // Check if waypoint was reached
+            waypointReached = waypointDistance < waypointAcceptanceRadius;
+
+            if (!waypointReached) {
+
 #ifdef VELOCITY_CONTROL
-        
-        velocityControl(targetX, targetY, targetZ, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ);
-        
+
+                controlMethod = true;
+                
+                velocityControl(targetX, targetY, targetZ, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ, tetherRate, elevationRate, azimuthRate, speed);
+
 #else
-        
-        positionControl(targetTetherLength, targetElevation, targetAzimuth, tetherTolerance, ElevationTolerance, azimuthTolerance, tetherRate, elevationRate, azimuthRate);
-        
+                
+                controlMethod = false;
+
+                positionControl(targetTetherLength, targetElevation, targetAzimuth, tetherTolerance, ElevationTolerance, azimuthTolerance, tetherRate, elevationRate, azimuthRate);
+
 #endif
 
-        // Distance to waypoint
-        waypointDistance = sqrt(pow(currentX - targetX, 2) + pow(currentY - targetY, 2) + pow(currentZ - targetZ, 2));
+            } else {
 
-        // Check if waypoint was reached
-        //        waypointReached = waypointDistance < waypointAcceptanceRadius;
+                // Stop motion of Fotokite
+                pos(0, 0, 0);
 
-        // Log
-        log(targetX, targetY, targetZ, targetTetherLength, targetElevation, targetAzimuth, currentTetherLength, currentElevation, currentAzimuth, currentX, currentY, currentZ, contactPointX, contactPointY, contactPointZ, tetherRate, elevationRate, azimuthRate, waypointAcceptanceRadius, waypointDistance, waypointReached);
+            }
+
+            // The pos message was used so reset new message flag
+            state->NEW_POS_MESSAGE = false;
+
+        }
+
+        // View control. We have to do view control every time, even if the view was previously reached. Control of Fotokite's position might invalidate the view.
+        viewReached = viewControl(pointOfInterestX, pointOfInterestY, pointOfInterestZ, currentX, currentY, currentZ, 0.1, 0.1, targetYaw, targetGimbalPitch, currentYaw, currentGimbalPitch, yawRate, gimbalPitchRate);
+
+        // Only log if there is a new information
+        if (state->NEW_POS_MESSAGE || state->NEW_ATTITUDE_MESSAGE || state->NEW_GIMBAL_MESSAGE) {
+            
+            // Log
+            log(targetX, targetY, targetZ, targetTetherLength, targetElevation, targetAzimuth,
+                    currentTetherLength, currentElevation, currentAzimuth, currentX,
+                    currentY, currentZ, contactPointX, contactPointY, contactPointZ,
+                    tetherRate, elevationRate, azimuthRate, waypointAcceptanceRadius,
+                    waypointDistance, waypointReached, controlMethod, speed, targetYaw,
+                    targetGimbalPitch, currentYaw, currentGimbalPitch, pointOfInterestX,
+                    pointOfInterestY, pointOfInterestZ, yawRate, gimbalPitchRate);
+        
+        }
 
         // Print debugging information to console
-        cout << targetTetherLength << " " << currentTetherLength << " | " << targetElevation << " " << currentElevation << " " << 1.57 - getElevation() << " | " << targetAzimuth << " " << currentAzimuth << " | " << waypointDistance << " | " << contactPointX << " " << contactPointY << " " << contactPointZ << " | " << contactPoints.top().totalTetherLength << endl;
+        //cout << currentX << " " << currentY << " " << currentZ << " " << waypointDistance << endl;
+        //        cout << targetTetherLength << " " << currentTetherLength << " | " << targetElevation << " " << currentElevation << " " << 1.57 - getElevation() << " | " << targetAzimuth << " " << (currentAzimuth / PI * 180) << " | " << waypointDistance << " | " << currentX << " " << currentY << " " << currentZ << endl;
         //cout << currentElevation << " " << currentAzimuth << endl;      
+
     }
+
+    // Waypoint and view is reached so stop Fotokite
+    stop();
 
     // Print waypoint reached
     cout << "Waypoint " << targetX << " " << targetY << " " << targetZ << " reached." << endl;
@@ -1152,6 +1531,18 @@ void Fotokite::executePath(string fileName) {
             // Parse z
             line = line.substr(nextCharacterPosition);
             double z = stod(line, &nextCharacterPosition);
+            
+            // Parse point of interest x
+            line = line.substr(nextCharacterPosition);
+            double pointOfInterestX = stod(line, &nextCharacterPosition);
+            
+            // Parse point of interest y
+            line = line.substr(nextCharacterPosition);
+            double pointOfInterestY = stod(line, &nextCharacterPosition);
+            
+            // Parse point of interest z
+            line = line.substr(nextCharacterPosition);
+            double pointOfInterestZ = stod(line, &nextCharacterPosition);
 
             // Parse contact point x
             line = line.substr(nextCharacterPosition);
@@ -1165,11 +1556,11 @@ void Fotokite::executePath(string fileName) {
             line = line.substr(nextCharacterPosition);
             double contactPointZ = stod(line, &nextCharacterPosition);
 
-            // Scale planner coordinates (obstacle units) to Fotokite coordinates (meters). One planner unit is 33 cm.
-            scaleCoordinates(x, y, z, contactPointX, contactPointY, contactPointZ, 0.33);
+            // Scale planner coordinates (obstacle units) to Fotokite coordinates (meters). One planner unit is 33 cm. Only used with cardboard boxes and MATLAB planner.
+            //scaleCoordinates(x, y, z, contactPointX, contactPointY, contactPointZ, 0.33);
 
-            // Rearrange the planner coordinates to correspond to Fotokite coordinates
-            rearrangeCoordinates(x, y, z, contactPointX, contactPointY, contactPointZ);
+            // Rearrange the planner coordinates to correspond to Fotokite coordinates. Only used with MATLAB planner.
+            //rearrangeCoordinates(x, y, z, contactPointX, contactPointY, contactPointZ);
 
             // Shift the entire path up to prevent beeing too close to the ground as Fotokite has lower limit on elevation angle (TODO fix this)
             //            double offset = 1;
@@ -1177,10 +1568,10 @@ void Fotokite::executePath(string fileName) {
             //            contactPointY += offset; // TODO offset to contact point
 
             // Print target waypoint
-            //            cout << "Going to waypoint " << x << " " << y << " " << z << " with contact point " << contactPointX << " " << contactPointY << " " << contactPointZ << "." << endl;
+            cout << "Going to waypoint " << x << " " << y << " " << z << " with point of interest " << pointOfInterestX << " " << pointOfInterestY << " " << pointOfInterestZ << " with contact point " << contactPointX << " " << contactPointY << " " << contactPointZ << "." << endl;
 
             // Go to waypoint
-            goToWaypoint(x, y, z, 0, 0, 0, contactPointX, contactPointY, contactPointZ);
+            goToWaypoint(x, y, z, pointOfInterestX, pointOfInterestY, pointOfInterestZ, contactPointX, contactPointY, contactPointZ);
 
         }
 
@@ -1222,10 +1613,23 @@ void Fotokite::executePath(string fileName) {
  * @param waypointDistance
  * @param waypointReached
  */
-void Fotokite::log(double targetX, double targetY, double targetZ, double targetTetherLength, double targetElevation, double targetAzimuth, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ, double contactPointX, double contactPointY, double contactPointZ, double tetherRate, double elevationRate, double azimuthRate, double waypointAcceptanceRadius, double waypointDistance, double waypointReached) {
+void Fotokite::log(double targetX, double targetY, double targetZ, double targetTetherLength,
+        double targetElevation, double targetAzimuth, double currentTetherLength, double currentElevation,
+        double currentAzimuth, double currentX, double currentY, double currentZ, double contactPointX,
+        double contactPointY, double contactPointZ, double tetherRate, double elevationRate,
+        double azimuthRate, double waypointAcceptanceRadius, double waypointDistance,
+        double waypointReached, bool controlMethod, double speed, double targetYaw,
+        double targetGimbalPitch, double currentYaw, double currentGimbalPitch, double pointOfInterestX,
+        double pointOfInterestY, double pointOfInterestZ, double yawRate, double gimbalPitchRate) {
 
     // Log time
     logFile << getCurrentTime();
+    logFile << " ";
+    
+    logFile << controlMethod;
+    logFile << " ";
+    
+    logFile << speed;
     logFile << " ";
 
     logFile << targetX;
@@ -1254,6 +1658,12 @@ void Fotokite::log(double targetX, double targetY, double targetZ, double target
 
     logFile << targetAzimuth;
     logFile << " ";
+    
+    logFile << targetYaw;
+    logFile << " ";
+
+    logFile << targetGimbalPitch;
+    logFile << " ";
 
     logFile << currentTetherLength;
     logFile << " ";
@@ -1262,6 +1672,21 @@ void Fotokite::log(double targetX, double targetY, double targetZ, double target
     logFile << " ";
 
     logFile << currentAzimuth;
+    logFile << " ";
+    
+    logFile << currentYaw;
+    logFile << " ";
+    
+    logFile << currentGimbalPitch;
+    logFile << " ";
+    
+    logFile << pointOfInterestX;
+    logFile << " ";
+
+    logFile << pointOfInterestY;
+    logFile << " ";
+
+    logFile << pointOfInterestZ;
     logFile << " ";
 
     logFile << contactPointX;
@@ -1281,7 +1706,13 @@ void Fotokite::log(double targetX, double targetY, double targetZ, double target
 
     logFile << azimuthRate;
     logFile << " ";
+    
+    logFile << yawRate;
+    logFile << " ";
 
+    logFile << gimbalPitchRate;
+    logFile << " ";
+    
     logFile << waypointAcceptanceRadius;
     logFile << " ";
 

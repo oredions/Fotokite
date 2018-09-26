@@ -13,9 +13,9 @@ Details about the project can be found in the following IEEE publications:
 
 [Visual servoing for teleoperation using a tethered UAV](http://ieeexplore.ieee.org/document/8088155/)
 
-Motion planning for a UAV with a straight or kinked tether (submitted to IROS 2018)
+Motion planning for a UAV with a straight or kinked tether (accepted to IROS 2018)
 
-Indoor UAV Localization Using a Tether (submitted to SSRR 2018)
+Indoor UAV Localization Using a Tether (accepted to SSRR 2018)
 
 ## Run
 

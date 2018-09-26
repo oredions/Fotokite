@@ -43,6 +43,10 @@ void Communication::startRemoteControl() {
     // Disable checksum
     send("Checksum 0\n");
 
+    // Change the attitude and position message frequency to 10 Hz (should send only once but send it every time remote control is started just to be sure)
+    send("Pset 117,10.0\n");
+    send("Pcommit\n");
+    
     // Set update frequency
     send("Get_GroundStatus 0\n");
     send("Get_Att 0\n");

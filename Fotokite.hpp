@@ -46,10 +46,21 @@ public:
     double getQZ();
     double getQW();
     
+    // Gimbal getters
+    double getGimbalQX();
+    double getGimbalQY();
+    double getGimbalQZ();
+    double getGimbalQW();
+    
     // Orientation getters
     double getYaw();
     double getPitch();
     double getRoll();
+    
+    // Gimbal orientation getters
+    double getGimbalYaw();
+    double getGimbalPitch();
+    double getGimbalRoll();
 
     // Position getters
     double getElevation();
@@ -69,6 +80,7 @@ public:
 
     // Position control
     void pos(double, double, double);
+    void pos2(double, double, double);
     void posV(double);
     void posH(double);
     void posL(double);
@@ -76,6 +88,9 @@ public:
     // Yaw control
     void yaw(double);
 
+    // Stop Fotokite
+    void stop();
+    
     // Print current state
     void printState();
 
@@ -85,7 +100,7 @@ public:
     
     // Control
     void positionControl(double targetTetherLength, double targetElevation, double targetAzimuth, double tetherTolerance, double ElevationTolerance, double azimuthTolerance, double tetherRate, double elevationRate, double azimuthRate);
-    void velocityControl(double x, double y, double z, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ);
+    void velocityControl(double x, double y, double z, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ, double &, double &, double &, double &);
 
     // Coordinates transformation
     void rearrangeCoordinates(double& x, double& y, double& z, double& contactPointX, double& contactPointY, double& contactPointZ);
@@ -118,7 +133,7 @@ private:
     void sendCommand(string);
 
     // Log
-    void log(double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double);
+    void log(double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, bool, double, double, double, double, double, double, double, double, double, double);
 
     double correctInputValues(double, double);
 
@@ -128,6 +143,11 @@ private:
     double tetherControl(double, double);
     double elevationControl(double, double);
     double azimuthControl(double, double);
+    
+    // View control
+    bool viewControl(double, double, double, double, double, double, double, double, double &, double &, double &, double &, double &, double &);
+    bool yawControl(double, double, double, double, double, double &, double &, double &);
+    bool gimbalPitchControl(double, double, double, double, double, double, double, double &, double &, double &);
 
     // Corrected elevation
     double getCorrectedElevation();
@@ -142,6 +162,20 @@ private:
 //    double tetherLinearDensity = 0.0061; // kg / m
 //    double airframeWeight = 0.618; // kg
 //    
+    
+    // Tether length scale
+    
+    // Tether unit transform. 100 ticks is 0.406 m (measured using 1 experiment while sending 100 ticks one times). Therefore, 1 tick is 0.406/100 m.
+    //double tetherScale = 0.406 / 100;
+
+    // Tether unit transform. 1000 ticks is 2.85 m (measured using 5 experiments while sending 100 ticks ten times). Therefore, 1 tick is 2.85/1000 m. Unit is meter per tick.
+    const double TETHER_SCALE = 0.00285;
+    
+    // Tether length velocity at which the tether length does not change
+    const double TETHER_NO_MOTION_RATE = -440;
+    
+    // Width of dead zone centered in TETHER_NO_MOTION_RATE. Tether is not moving in this range.
+    const double DEAD_ZONE_WIDTH = 140;
 };
 
 #endif /* FOTOKITE_HPP */

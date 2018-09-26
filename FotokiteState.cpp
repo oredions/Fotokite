@@ -53,21 +53,37 @@ void FotokiteState::updateSingle(string message) {
         this->runtimeS = stod(nextToken(&message, ","));
         this->groundBattVoltage = stod(nextToken(&message, ","));
         this->relTetherLength = stod(nextToken(&message, ","));
+        
+        NEW_GSSSTATUS_MESSAGE = true;
 
     } else if (header.compare("!Attitude") == 0) {
-
+ 
         // Attitude message
         this->QW = stod(nextToken(&message, ","));
         this->QX = stod(nextToken(&message, ","));
         this->QY = stod(nextToken(&message, ","));
         this->QZ = stod(nextToken(&message, ","));
+        
+        NEW_ATTITUDE_MESSAGE = true;
+        
+    } else if (header.compare("!Gimbal") == 0) {
+        
+        // Attitude message
+        this->gimbalQW = stod(nextToken(&message, ","));
+        this->gimbalQX = stod(nextToken(&message, ","));
+        this->gimbalQY = stod(nextToken(&message, ","));
+        this->gimbalQZ = stod(nextToken(&message, ","));
+        
+        NEW_GIMBAL_MESSAGE = true;
 
     } else if (header.compare("!Pos") == 0) {
-
+        
         // Position message
         this->elevation = stod(nextToken(&message, ","));
         this->relAzimuth = stod(nextToken(&message, ","));
         this->baroAlt = stod(nextToken(&message, ","));
+        
+        NEW_POS_MESSAGE = true;
 
     } else if (header.compare("!FlightStatus") == 0) {
 
@@ -77,6 +93,8 @@ void FotokiteState::updateSingle(string message) {
         this->backup = stod(nextToken(&message, ","));
         this->flags = stoi(nextToken(&message, ","));
 
+        NEW_FLIGHTSTATUS_MESSAGE = true;
+        
     } else if (header.compare("!Param") == 0) {
         
         // This message is not documented in the Fotokite Pro 1 Remote Control Protocol v0.2

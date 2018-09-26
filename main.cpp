@@ -19,11 +19,11 @@ int main(int argc, char *argv[]) {
     Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem1");
 
     // Execute path
-    //fotokite->executePath("input/path.txt");
-
+    fotokite->executePath("input/velocity_control_test.txt");
+    
     // Go to waypoint
-//    fotokite->goToWaypoint(3, 2, 3, 0, 0, 0, 0, 0, 0);
-
+//    fotokite->goToWaypoint(1, 1, 1, 1, 1, 2, 0, 0, 0);
+      
     // Elevation angle tether arc correction experiment. For each point the first
     // trial is with the uncorrected elevation angle and the second trial is with
     // the corrected elevation angle for tether arc. All the points are on the
@@ -61,12 +61,17 @@ int main(int argc, char *argv[]) {
 //    fotokite->goToWaypoint(2.5 / sqrt(2), 2, 2.5 / sqrt(2), 0, 0, 0, 0, 0, 0);
 //    fotokite->goToWaypoint(2 / sqrt(2), 2, 2 / sqrt(2), 0, 0, 0, 0, 0, 0);
 //    fotokite->goToWaypoint(1.5 / sqrt(2), 2, 1.5 / sqrt(2), 0, 0, 0, 0, 0, 0);
-    fotokite->goToWaypoint(1 / sqrt(2), 2, 1 / sqrt(2), 0, 0, 0, 0, 0, 0);
+//    fotokite->goToWaypoint(1 / sqrt(2), 2, 1 / sqrt(2), 0, 0, 0, 0, 0, 0);
     
     // Print state
-    //    while (true) {
-    //        fotokite->printState();
-    //    }
+//    while (true) {
+//        fotokite->printState();
+//    }
+    
+    // Print attitude
+//    while (true) {
+//        cout << "!Attitude " + to_string(fotokite->getQX()) + "," + to_string(fotokite->getQY()) + "," + to_string(fotokite->getQZ()) + "," + to_string(fotokite->getQW()) << endl; 
+//    }
 
     // Ground status message
     //    fotokite->getGroundMode();
@@ -104,7 +109,7 @@ int main(int argc, char *argv[]) {
 
     // Yaw
     //    fotokite->yaw(-0.1);
-
+            
     // Delete Fotokite object (important for stopping remote control mode on Fotokite)
     delete fotokite;
 

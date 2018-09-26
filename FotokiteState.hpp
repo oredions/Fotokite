@@ -32,6 +32,12 @@ public:
     double QZ;
     double QW;
     
+    // Gimbal message
+    double gimbalQX;
+    double gimbalQY;
+    double gimbalQZ;
+    double gimbalQW;
+    
     // Position message
     double elevation;
     double relAzimuth;
@@ -44,6 +50,13 @@ public:
     unsigned int flags : 13;
     
     void update(string);
+    
+    // Check if all messages from Fotokite were received and the system is initialized
+    bool NEW_GSSSTATUS_MESSAGE = false;
+    bool NEW_ATTITUDE_MESSAGE = false;
+    bool NEW_GIMBAL_MESSAGE = false;
+    bool NEW_POS_MESSAGE = false;
+    bool NEW_FLIGHTSTATUS_MESSAGE = false;
     
 private:
     

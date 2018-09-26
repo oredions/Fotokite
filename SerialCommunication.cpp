@@ -61,9 +61,10 @@ void SerialCommunication::close_connection() {
     // Join with listener
     listener.join();
 
+    // Sleep to make sure the message gets accepted
+    usleep(500000);
+    
     // Stop remote control mode
-    send("stop\n");
-    send("stop\n");
     send("stop\n");
     
 }
