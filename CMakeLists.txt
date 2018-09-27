@@ -12,3 +12,4 @@ file(GLOB SOURCES
 )
 add_executable(Fotokite ${SOURCES})
 target_link_libraries(Fotokite ${OpenCV_LIBS})
+target_link_libraries(Fotokite pthread)
