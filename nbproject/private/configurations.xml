@@ -36,6 +36,8 @@
       <in>SerialCommunication.hpp</in>
       <in>SocketCommunication.cpp</in>
       <in>SocketCommunication.hpp</in>
+      <in>Visualization.cpp</in>
+      <in>Visualization.hpp</in>
       <in>main.cpp</in>
     </df>
   </logicalFolder>

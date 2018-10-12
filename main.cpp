@@ -13,10 +13,10 @@
 int main(int argc, char *argv[]) {
 
     // Initialize Fotokite interface for OCU server
-    //    Fotokite * fotokite = new Fotokite("127.0.0.1", 5050);
+    Fotokite * fotokite = new Fotokite("127.0.0.1", 8080, 8080);
 
     // Initialize Fotokite interface for USB serial interface
-    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem1");
+//    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem1");
 
     // Execute path
     fotokite->executePath("input/velocity_control_test.txt");
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
 
     // Yaw
     //    fotokite->yaw(-0.1);
-            
+         
     // Delete Fotokite object (important for stopping remote control mode on Fotokite)
     delete fotokite;
 

@@ -8,7 +8,7 @@
 #ifndef FOTOKITE_HPP
 #define FOTOKITE_HPP
 
-#include "opencv2/core.hpp"
+//#include "opencv2/core.hpp"
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
@@ -25,11 +25,11 @@
 #include "ContactPoint.hpp"
 
 using namespace std;
-using namespace cv;
+//using namespace cv;
 
 class Fotokite {
 public:
-    Fotokite(const char *, const short);
+    Fotokite(const char *, const short, const short);
     Fotokite(const char *);
     Fotokite(const Fotokite& orig);
     virtual ~Fotokite();
@@ -111,7 +111,7 @@ private:
     FotokiteState * state;
 
     Communication * communication;
-
+    
     // Log file
     ofstream logFile;
 
@@ -134,7 +134,7 @@ private:
 
     // Log
     void log(double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, bool, double, double, double, double, double, double, double, double, double, double);
-
+    
     double correctInputValues(double, double);
 
     double getScaledTetherLength();
@@ -172,10 +172,13 @@ private:
     const double TETHER_SCALE = 0.00285;
     
     // Tether length velocity at which the tether length does not change
-    const double TETHER_NO_MOTION_RATE = -440;
+//    const double TETHER_NO_MOTION_RATE = -440;
+    const double TETHER_NO_MOTION_RATE = -160;
     
     // Width of dead zone centered in TETHER_NO_MOTION_RATE. Tether is not moving in this range.
-    const double DEAD_ZONE_WIDTH = 140;
+//    const double DEAD_ZONE_WIDTH = 140;
+    const double DEAD_ZONE_WIDTH = 80;
+    
 };
 
 #endif /* FOTOKITE_HPP */

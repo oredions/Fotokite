@@ -36,6 +36,10 @@ void Communication::startRemoteControl() {
     send("\n");
     send("\n");
     send("\n");
+    
+    // Increase gains in reel motor control loop to mitigate the dead zone
+    send("GSLowControl params 2 2\n");
+//    send("GSLowControl params 3 1\n");
 
     // Start remote control
     send("RemoteControl start\n");

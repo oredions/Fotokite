@@ -17,7 +17,7 @@
 //#define CORRECT_ELEVATION_ANGLE
 
 // Switch between position control and velocity control. Comment if you want position control. Uncomment if you want velocity control.
-#define VELOCITY_CONTROL
+//#define VELOCITY_CONTROL
 
 /**
  * Initialize wireless communication with the Fotokite server.
@@ -25,13 +25,13 @@
  * @param ip_address
  * @param port
  */
-Fotokite::Fotokite(const char * ip_address, const short port) {
+Fotokite::Fotokite(const char * ip_address, const short port_send, const short port_receive) {
 
     // Initialize Fotokite state
     state = new FotokiteState();
 
     // Initialize communication with Fotokite OCU Server
-    communication = new SocketCommunication(state, ip_address, port);
+    communication = new SocketCommunication(state, ip_address, port_send, port_receive);
 
     // Initialize log
     logFile.open("log/" + getCurrentTime() + ".txt");
@@ -814,73 +814,73 @@ double Fotokite::azimuthControl(double targetAzimuth, double tolerance) {
  * @param currentY
  * @param currentZ
  */
-void Fotokite::velocityControl(double x, double y, double z, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ, double & tetherLengthVelocity, double & elevationRate, double & azimuthRate, double & speed) {
-
-    // Compute Jacobian
-    Mat jacobian = Mat::zeros(3, 3, CV_64F);
-    jacobian.at<double>(0, 0) = cos(currentElevation) * cos(currentAzimuth);
-    jacobian.at<double>(0, 1) = -currentTetherLength * cos(currentAzimuth) * sin(currentElevation);
-    jacobian.at<double>(0, 2) = -currentTetherLength * cos(currentElevation) * sin(currentAzimuth);
-    jacobian.at<double>(1, 0) = sin(currentElevation);
-    jacobian.at<double>(1, 1) = currentTetherLength * cos(currentElevation);
-    jacobian.at<double>(1, 2) = 0;
-    jacobian.at<double>(2, 0) = -cos(currentElevation) * sin(currentAzimuth);
-    jacobian.at<double>(2, 1) = currentTetherLength * sin(currentAzimuth) * sin(currentElevation);
-    jacobian.at<double>(2, 2) = -currentTetherLength * cos(currentElevation) * cos(currentAzimuth);
-
-    // Velocity vector deltas
-    double deltaX = x - currentX;
-    double deltaY = y - currentY;
-    double deltaZ = z - currentZ;
-
-    // Velocity vector length
-    double velocityVectorLength = sqrt(pow(deltaX, 2) + pow(deltaY, 2) + pow(deltaZ, 2));
-
-    // Velocity unit vector going from start to target
-    Mat velocityUnitVector = Mat::zeros(3, 1, CV_64F);
-    velocityUnitVector.at<double>(0, 0) = deltaX / velocityVectorLength;
-    velocityUnitVector.at<double>(1, 0) = deltaY / velocityVectorLength;
-    velocityUnitVector.at<double>(2, 0) = deltaZ / velocityVectorLength;
-
-    // Desired speed in m/s
-    speed = 0.1;
-
-    // Velocity vector in metric units (m/s)
-    Mat velocityVector = Mat::zeros(3, 1, CV_64F);
-    velocityVector = velocityUnitVector * speed;
-
-    // Commands for velocity control
-    Mat commands = jacobian.inv() * velocityVector;
-
-    // Tether length velocity in m/s
-    double tetherLengthVelocityMetric = commands.at<double>(0, 0);
-
-    // Map tether velocity dead zone to active zone by using two linear functions
-    if (tetherLengthVelocityMetric > 0) {
-        
-        tetherLengthVelocity = (tetherLengthVelocityMetric / TETHER_SCALE) + TETHER_NO_MOTION_RATE + (DEAD_ZONE_WIDTH / 2);
-        
-    } else if (tetherLengthVelocityMetric < 0) {
-        
-        tetherLengthVelocity = (tetherLengthVelocityMetric / TETHER_SCALE) + TETHER_NO_MOTION_RATE - (DEAD_ZONE_WIDTH / 2);
-        
-    } else {
-        
-        tetherLengthVelocity = TETHER_NO_MOTION_RATE;
-        
-    }
-
-    // Get control rates for elevation and azimuth
-    elevationRate = commands.at<double>(1, 0);
-    azimuthRate = commands.at<double>(2, 0);
-
-    // Send commands
-    pos2(elevationRate, azimuthRate, tetherLengthVelocity);
-
-    // Debugging message
-    //cout << tetherLengthVelocity << " " << elevationRate << " " << azimuthRate << " | " << velocityUnitVector.at<double>(0,0) << " " << velocityUnitVector.at<double>(1,0) << " " << velocityUnitVector.at<double>(2,0) << endl; // << " | " << targetAzimuth << " " << currentAzimuth << " | " << waypointDistance << " | " << contactPointX << " " << contactPointY << " " << contactPointZ << " | " << contactPoints.top().totalTetherLength << endl;
-
-}
+//void Fotokite::velocityControl(double x, double y, double z, double currentTetherLength, double currentElevation, double currentAzimuth, double currentX, double currentY, double currentZ, double & tetherLengthVelocity, double & elevationRate, double & azimuthRate, double & speed) {
+//
+//    // Compute Jacobian
+//    Mat jacobian = Mat::zeros(3, 3, CV_64F);
+//    jacobian.at<double>(0, 0) = cos(currentElevation) * cos(currentAzimuth);
+//    jacobian.at<double>(0, 1) = -currentTetherLength * cos(currentAzimuth) * sin(currentElevation);
+//    jacobian.at<double>(0, 2) = -currentTetherLength * cos(currentElevation) * sin(currentAzimuth);
+//    jacobian.at<double>(1, 0) = sin(currentElevation);
+//    jacobian.at<double>(1, 1) = currentTetherLength * cos(currentElevation);
+//    jacobian.at<double>(1, 2) = 0;
+//    jacobian.at<double>(2, 0) = -cos(currentElevation) * sin(currentAzimuth);
+//    jacobian.at<double>(2, 1) = currentTetherLength * sin(currentAzimuth) * sin(currentElevation);
+//    jacobian.at<double>(2, 2) = -currentTetherLength * cos(currentElevation) * cos(currentAzimuth);
+//
+//    // Velocity vector deltas
+//    double deltaX = x - currentX;
+//    double deltaY = y - currentY;
+//    double deltaZ = z - currentZ;
+//
+//    // Velocity vector length
+//    double velocityVectorLength = sqrt(pow(deltaX, 2) + pow(deltaY, 2) + pow(deltaZ, 2));
+//
+//    // Velocity unit vector going from start to target
+//    Mat velocityUnitVector = Mat::zeros(3, 1, CV_64F);
+//    velocityUnitVector.at<double>(0, 0) = deltaX / velocityVectorLength;
+//    velocityUnitVector.at<double>(1, 0) = deltaY / velocityVectorLength;
+//    velocityUnitVector.at<double>(2, 0) = deltaZ / velocityVectorLength;
+//
+//    // Desired speed in m/s
+//    speed = 0.1;
+//
+//    // Velocity vector in metric units (m/s)
+//    Mat velocityVector = Mat::zeros(3, 1, CV_64F);
+//    velocityVector = velocityUnitVector * speed;
+//
+//    // Commands for velocity control
+//    Mat commands = jacobian.inv() * velocityVector;
+//
+//    // Tether length velocity in m/s
+//    double tetherLengthVelocityMetric = commands.at<double>(0, 0);
+//
+//    // Map tether velocity dead zone to active zone by using two linear functions
+//    if (tetherLengthVelocityMetric > 0) {
+//        
+//        tetherLengthVelocity = (tetherLengthVelocityMetric / TETHER_SCALE) + TETHER_NO_MOTION_RATE + (DEAD_ZONE_WIDTH / 2);
+//        
+//    } else if (tetherLengthVelocityMetric < 0) {
+//        
+//        tetherLengthVelocity = (tetherLengthVelocityMetric / TETHER_SCALE) + TETHER_NO_MOTION_RATE - (DEAD_ZONE_WIDTH / 2);
+//        
+//    } else {
+//        
+//        tetherLengthVelocity = TETHER_NO_MOTION_RATE;
+//        
+//    }
+//
+//    // Get control rates for elevation and azimuth
+//    elevationRate = commands.at<double>(1, 0);
+//    azimuthRate = commands.at<double>(2, 0);
+//
+//    // Send commands
+//    pos2(elevationRate, azimuthRate, tetherLengthVelocity);
+//
+//    // Debugging message
+//    //cout << tetherLengthVelocity << " " << elevationRate << " " << azimuthRate << " | " << velocityUnitVector.at<double>(0,0) << " " << velocityUnitVector.at<double>(1,0) << " " << velocityUnitVector.at<double>(2,0) << endl; // << " | " << targetAzimuth << " " << currentAzimuth << " | " << waypointDistance << " | " << contactPointX << " " << contactPointY << " " << contactPointZ << " | " << contactPoints.top().totalTetherLength << endl;
+//
+//}
 
 /**
  * Position control for Fotokite's attitude.
@@ -1434,7 +1434,7 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
                     waypointDistance, waypointReached, controlMethod, speed, targetYaw,
                     targetGimbalPitch, currentYaw, currentGimbalPitch, pointOfInterestX,
                     pointOfInterestY, pointOfInterestZ, yawRate, gimbalPitchRate);
-        
+                    
         }
 
         // Print debugging information to console
