@@ -13,16 +13,26 @@
 int main(int argc, char *argv[]) {
 
     // Initialize Fotokite interface for OCU server
-    Fotokite * fotokite = new Fotokite("127.0.0.1", 8080, 8080);
+//    Fotokite * fotokite = new Fotokite("127.0.0.1", 8080, 8080);
 
     // Initialize Fotokite interface for USB serial interface
-//    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem1");
+    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem1");
 
+    fotokite->takeoff();
+    
     // Execute path
     fotokite->executePath("input/velocity_control_test.txt");
     
+    fotokite->land();
+    
+//    fotokite->stopMotors();
+    
+//    sleep(5);
+//    fotokite->takeoff();
+//    fotokite->land();
+    
     // Go to waypoint
-//    fotokite->goToWaypoint(1, 1, 1, 1, 1, 2, 0, 0, 0);
+//    fotokite->goToWaypoint(0, 1, 0, 10, 1, 0, 0, 0, 0);
       
     // Elevation angle tether arc correction experiment. For each point the first
     // trial is with the uncorrected elevation angle and the second trial is with

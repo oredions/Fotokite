@@ -8,7 +8,7 @@
 #ifndef FOTOKITE_HPP
 #define FOTOKITE_HPP
 
-//#include "opencv2/core.hpp"
+#include "opencv2/core.hpp"
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
@@ -25,7 +25,7 @@
 #include "ContactPoint.hpp"
 
 using namespace std;
-//using namespace cv;
+using namespace cv;
 
 class Fotokite {
 public:
@@ -33,7 +33,7 @@ public:
     Fotokite(const char *);
     Fotokite(const Fotokite& orig);
     virtual ~Fotokite();
-
+    
     // Ground status getters
     int getGroundMode();
     double getRuntimeS();
@@ -73,6 +73,14 @@ public:
     double getBackup();
     unsigned int getFlags();
 
+    // Takeoff and landing
+    void disableTetherController();
+    void enableTetherController();
+    void startMotors();
+    void takeoff();
+    void stopMotors();
+    void land();
+    
     // Gimbal control
     void gimbal(double, double);
     void gimbalRoll(double);
@@ -95,6 +103,7 @@ public:
     void printState();
 
     // Waypoint navigation
+    void goToWaypoint(double waypoint[9]);
     void goToWaypoint(double, double, double, double, double, double, double, double, double);
     void executePath(string);
     

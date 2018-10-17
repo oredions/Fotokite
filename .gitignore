@@ -4,5 +4,9 @@ CMakeFiles
 compile_commands.json
 Makefile
 Fotokite
+FotokiteExecutePath
+FotokiteGoToWaypoint
+FotokiteLand
+FotokiteTakeoff
 .DS_Store
 log/

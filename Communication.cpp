@@ -30,6 +30,9 @@ Communication::~Communication() {
  */
 void Communication::startRemoteControl() {
     
+    // Initialize Fotokite to known state
+    send("stop\n");
+    
     // Send 5 carriage returns
     send("\n");
     send("\n");
@@ -51,11 +54,16 @@ void Communication::startRemoteControl() {
     send("Pset 117,10.0\n");
     send("Pcommit\n");
     
+    // Stop debugging information from being sent from airframe down to the ground station
+    send("Pset 119,0\n");
+    send("Pcommit\n");
+    
     // Set update frequency
     send("Get_GroundStatus 0\n");
     send("Get_Att 0\n");
     send("Get_Pos 0\n");
     send("Get_FlightStatus 0\n");
+    send("Get_Gimbal 0\n");
     
 }
 
