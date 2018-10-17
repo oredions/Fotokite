@@ -17,6 +17,30 @@
                     <name>Default</name>
                     <type>0</type>
                 </confElem>
+                <confElem>
+                    <name>Fotokite</name>
+                    <type>0</type>
+                </confElem>
+                <confElem>
+                    <name>FotokiteTakeoff</name>
+                    <type>0</type>
+                </confElem>
+                <confElem>
+                    <name>FotokiteLand</name>
+                    <type>0</type>
+                </confElem>
+                <confElem>
+                    <name>FotokiteGoToWaypoint</name>
+                    <type>0</type>
+                </confElem>
+                <confElem>
+                    <name>FotokiteExecutePath</name>
+                    <type>0</type>
+                </confElem>
+                <confElem>
+                    <name>FotokiteGoToWaypoint_2</name>
+                    <type>0</type>
+                </confElem>
             </confList>
             <formatting>
                 <project-formatting-style>false</project-formatting-style>

@@ -115,6 +115,7 @@ void FotokiteState::updateSingle(string message) {
     } else {
         // Unknown message from Fotokite, this might still be good, since it might not be a telemetry message
         // cerr << "Error: Unknown message from Fotokite." << endl;
+        // cout << message << endl;
     }
 
 }

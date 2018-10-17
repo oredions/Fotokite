@@ -22,7 +22,8 @@ using namespace std;
 
 class SocketCommunication : public Communication {
 public:
-    SocketCommunication(FotokiteState *, const char *, const short);
+    
+    SocketCommunication(FotokiteState *, const char *, const short, const short);
     SocketCommunication(const SocketCommunication& orig);
     virtual ~SocketCommunication();
     
@@ -31,10 +32,15 @@ public:
     void close_connection();
     
 private:
+     
+    void initializeSendSocket(const char *, const short);
+    void initializeReceiveSocket(const char *, const short);
             
-    int socket_descriptor;
+    int socket_descriptor_send;
+    struct sockaddr_in socket_address_send;
     
-    struct sockaddr_in socket_address;
+    int socket_descriptor_receive;
+    struct sockaddr_in socket_address_receive;
 
 };
 

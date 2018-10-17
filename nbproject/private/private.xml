@@ -5,22 +5,24 @@
     </code-assistance-data>
     <data xmlns="http://www.netbeans.org/ns/make-project-private/1">
         <activeConfTypeElem>0</activeConfTypeElem>
-        <activeConfIndexElem>0</activeConfIndexElem>
+        <activeConfIndexElem>4</activeConfIndexElem>
     </data>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/input/velocity_control_test.txt</file>
             <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/main.cpp</file>
-            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/SocketCommunication.cpp</file>
             <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/FotokiteState.cpp</file>
+            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/Communication.cpp</file>
+            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/Communication.hpp</file>
+            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/SerialCommunication.cpp</file>
+            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/SocketCommunication.cpp</file>
+            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/input/path.txt</file>
             <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/SocketCommunication.hpp</file>
             <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/SerialCommunication.hpp</file>
-            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/Communication.cpp</file>
-            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/newfile.c</file>
             <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/Fotokite.cpp</file>
+            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/FotokiteState.hpp</file>
             <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/Fotokite.hpp</file>
-            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/SerialCommunication.cpp</file>
-            <file>file:/Users/jan/Documents/Research/Projects/NRI%20Visual%20Assistant/Code/Fotokite/Communication.hpp</file>
         </group>
     </open-files>
 </project-private>

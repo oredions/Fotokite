@@ -29,11 +29,11 @@ using namespace cv;
 
 class Fotokite {
 public:
-    Fotokite(const char *, const short);
+    Fotokite(const char *, const short, const short);
     Fotokite(const char *);
     Fotokite(const Fotokite& orig);
     virtual ~Fotokite();
-
+    
     // Ground status getters
     int getGroundMode();
     double getRuntimeS();
@@ -73,6 +73,14 @@ public:
     double getBackup();
     unsigned int getFlags();
 
+    // Takeoff and landing
+    void disableTetherController();
+    void enableTetherController();
+    void startMotors();
+    void takeoff();
+    void stopMotors();
+    void land();
+    
     // Gimbal control
     void gimbal(double, double);
     void gimbalRoll(double);
@@ -95,6 +103,7 @@ public:
     void printState();
 
     // Waypoint navigation
+    void goToWaypoint(double waypoint[9]);
     void goToWaypoint(double, double, double, double, double, double, double, double, double);
     void executePath(string);
     
@@ -111,7 +120,7 @@ private:
     FotokiteState * state;
 
     Communication * communication;
-
+    
     // Log file
     ofstream logFile;
 
@@ -134,7 +143,7 @@ private:
 
     // Log
     void log(double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, bool, double, double, double, double, double, double, double, double, double, double);
-
+    
     double correctInputValues(double, double);
 
     double getScaledTetherLength();
@@ -172,10 +181,13 @@ private:
     const double TETHER_SCALE = 0.00285;
     
     // Tether length velocity at which the tether length does not change
-    const double TETHER_NO_MOTION_RATE = -440;
+//    const double TETHER_NO_MOTION_RATE = -440;
+    const double TETHER_NO_MOTION_RATE = -160;
     
     // Width of dead zone centered in TETHER_NO_MOTION_RATE. Tether is not moving in this range.
-    const double DEAD_ZONE_WIDTH = 140;
+//    const double DEAD_ZONE_WIDTH = 140;
+    const double DEAD_ZONE_WIDTH = 80;
+    
 };
 
 #endif /* FOTOKITE_HPP */

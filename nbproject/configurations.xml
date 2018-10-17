@@ -2,15 +2,39 @@
 <configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
+      <df name="CMakeFiles">
+        <df name="3.7.2">
+          <df name="CompilerIdC">
+            <in>CMakeCCompilerId.c</in>
+          </df>
+          <df name="CompilerIdCXX">
+            <in>CMakeCXXCompilerId.cpp</in>
+          </df>
+        </df>
+        <in>feature_tests.c</in>
+        <in>feature_tests.cxx</in>
+      </df>
       <in>Communication.cpp</in>
+      <in>Communication.hpp</in>
       <in>ContactPoint.cpp</in>
       <in>ContactPoint.hpp</in>
       <in>Fotokite.cpp</in>
+      <in>Fotokite.hpp</in>
       <in>FotokiteState.cpp</in>
+      <in>FotokiteState.hpp</in>
       <in>Serial.cpp</in>
+      <in>Serial.h</in>
       <in>SerialCommunication.cpp</in>
+      <in>SerialCommunication.hpp</in>
       <in>SocketCommunication.cpp</in>
+      <in>SocketCommunication.hpp</in>
+      <in>Visualization.cpp</in>
+      <in>Visualization.hpp</in>
       <in>main.cpp</in>
+      <in>mainExecutePath.cpp</in>
+      <in>mainGoToWaypoint.cpp</in>
+      <in>mainLand.cpp</in>
+      <in>mainTakeoff.cpp</in>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -85,9 +109,491 @@
         <ccTool flags="0">
         </ccTool>
       </item>
+      <item path="Visualization.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Visualization.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
+      </item>
+      <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="mainLand.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+    </conf>
+    <conf name="Fotokite" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE}</buildCommand>
+          <cleanCommand>${MAKE} clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
+      </makefileType>
+      <item path="CMakeFiles/3.7.2/CompilerIdC/CMakeCCompilerId.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/3.7.2/CompilerIdCXX/CMakeCXXCompilerId.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.cxx" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ContactPoint.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Fotokite.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FotokiteState.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Serial.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Serial.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SerialCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SocketCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Visualization.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Visualization.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainLand.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="FotokiteTakeoff" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE}</buildCommand>
+          <cleanCommand>${MAKE} clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
+      </makefileType>
+      <item path="CMakeFiles/3.7.2/CompilerIdC/CMakeCCompilerId.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/3.7.2/CompilerIdCXX/CMakeCXXCompilerId.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.cxx" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ContactPoint.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Fotokite.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FotokiteState.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Serial.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Serial.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SerialCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SocketCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Visualization.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Visualization.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainLand.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="FotokiteLand" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE}</buildCommand>
+          <cleanCommand>${MAKE} clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
+      </makefileType>
+      <item path="CMakeFiles/3.7.2/CompilerIdC/CMakeCCompilerId.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/3.7.2/CompilerIdCXX/CMakeCXXCompilerId.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.cxx" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ContactPoint.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Fotokite.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FotokiteState.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Serial.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Serial.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SerialCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SocketCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Visualization.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Visualization.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainLand.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="FotokiteGoToWaypoint" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE}</buildCommand>
+          <cleanCommand>${MAKE} clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
+      </makefileType>
+      <item path="CMakeFiles/3.7.2/CompilerIdC/CMakeCCompilerId.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/3.7.2/CompilerIdCXX/CMakeCXXCompilerId.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.cxx" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ContactPoint.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Fotokite.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FotokiteState.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Serial.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Serial.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SerialCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SocketCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Visualization.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Visualization.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainLand.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="FotokiteExecutePath" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE}</buildCommand>
+          <cleanCommand>${MAKE} clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
+      </makefileType>
+      <item path="CMakeFiles/3.7.2/CompilerIdC/CMakeCCompilerId.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/3.7.2/CompilerIdCXX/CMakeCXXCompilerId.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.cxx" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ContactPoint.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Fotokite.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FotokiteState.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Serial.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Serial.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SerialCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SocketCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Visualization.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Visualization.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainLand.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="FotokiteGoToWaypoint_2" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE}</buildCommand>
+          <cleanCommand>${MAKE} clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
+      </makefileType>
+      <item path="CMakeFiles/3.7.2/CompilerIdC/CMakeCCompilerId.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/3.7.2/CompilerIdCXX/CMakeCXXCompilerId.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="CMakeFiles/feature_tests.cxx" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Communication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ContactPoint.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Fotokite.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FotokiteState.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Serial.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Serial.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SerialCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SocketCommunication.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Visualization.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Visualization.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainLand.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>

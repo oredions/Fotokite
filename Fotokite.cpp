@@ -17,7 +17,7 @@
 //#define CORRECT_ELEVATION_ANGLE
 
 // Switch between position control and velocity control. Comment if you want position control. Uncomment if you want velocity control.
-#define VELOCITY_CONTROL
+//#define VELOCITY_CONTROL
 
 /**
  * Initialize wireless communication with the Fotokite server.
@@ -25,13 +25,13 @@
  * @param ip_address
  * @param port
  */
-Fotokite::Fotokite(const char * ip_address, const short port) {
+Fotokite::Fotokite(const char * ip_address, const short port_send, const short port_receive) {
 
     // Initialize Fotokite state
     state = new FotokiteState();
 
     // Initialize communication with Fotokite OCU Server
-    communication = new SocketCommunication(state, ip_address, port);
+    communication = new SocketCommunication(state, ip_address, port_send, port_receive);
 
     // Initialize log
     logFile.open("log/" + getCurrentTime() + ".txt");
@@ -498,6 +498,100 @@ void Fotokite::sendCommand(string command) {
 
     this->communication->send(command + '\n');
 
+}
+
+
+void Fotokite::disableTetherController() {
+    
+    sendCommand("Pset 79,0.0");
+    
+}
+
+void Fotokite::enableTetherController() {
+    
+    sendCommand("Pset 79,1.0");
+    
+}
+
+/**
+ * Start Fotokite takeoff. If the vehicle is in IDLE state, this will instruct the vehicle to start the motors and takeoff.
+ */
+void Fotokite::startMotors() {
+    
+    sendCommand("StartTakeoff");
+
+}
+
+void Fotokite::takeoff() {
+    
+    cout << "Takeoff initiated" << endl;
+    
+    disableTetherController();
+    
+    cout << "Disabled tether controller" << endl;
+    
+    startMotors();
+    
+    cout << "Motors started" << endl;
+    
+    goToWaypoint(0, 1, 0, 10, 1, 0, 0, 0, 0);
+    
+    cout << "Waypoint reached" << endl;
+    
+    enableTetherController();
+    
+    cout << "Enabled tether controller" << endl;
+    
+}
+
+/**
+ * Stop Fotokite's motors. If the motors are spinning and the vehicle is not in emergency land, this command will stop the propellers.
+ */
+void Fotokite::stopMotors() {
+    
+    for (int i = 0; i < 50; i++) {
+        
+        // Sleep to make sure the message gets accepted
+        usleep(50000);
+        
+        sendCommand("MotorStop");
+        
+    }
+    
+}
+
+void Fotokite::land() {
+    
+    
+    cout << "Landing initiated" << endl;
+    
+    goToWaypoint(0, 1, 0, 10, 1, 0, 0, 0, 0);
+    
+    cout << "Waypoint reached" << endl;
+    
+    disableTetherController();
+    
+    cout << "Disabled tether controller" << endl;
+    
+    while (getScaledTetherLength() > 0.1) {
+        
+        if (state->NEW_GSSSTATUS_MESSAGE) {
+            posL(-1);
+//            pos2(0,0,-300);
+        }
+        
+    }
+    
+    cout << "Landing finished" << endl;
+    
+    stopMotors();
+    
+    cout << "Stopped motors" << endl;
+    
+    enableTetherController();
+    
+    cout << "Enabled tether controller" << endl;
+    
 }
 
 /**
@@ -1236,6 +1330,12 @@ void Fotokite::updateContactPoints(double newContactPointX, double newContactPoi
 
 }
 
+void Fotokite::goToWaypoint(double waypoint[9]) {
+    
+    goToWaypoint(waypoint[0], waypoint[1], waypoint[2], waypoint[3], waypoint[4], waypoint[5], waypoint[6], waypoint[7], waypoint[8]);
+    
+}
+
 /**
  * Go to specified waypoint given in Cartesian coordinate system.
  * 
@@ -1434,7 +1534,7 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
                     waypointDistance, waypointReached, controlMethod, speed, targetYaw,
                     targetGimbalPitch, currentYaw, currentGimbalPitch, pointOfInterestX,
                     pointOfInterestY, pointOfInterestZ, yawRate, gimbalPitchRate);
-        
+                    
         }
 
         // Print debugging information to console
