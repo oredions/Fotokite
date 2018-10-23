@@ -7,6 +7,7 @@
 
 #include "Fotokite.hpp"
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 
@@ -528,19 +529,13 @@ void Fotokite::takeoff() {
     
     disableTetherController();
     
-    cout << "Disabled tether controller" << endl;
-    
     startMotors();
-    
-    cout << "Motors started" << endl;
     
     goToWaypoint(0, 1, 0, 10, 1, 0, 0, 0, 0);
     
-    cout << "Waypoint reached" << endl;
-    
     enableTetherController();
     
-    cout << "Enabled tether controller" << endl;
+    cout << "Takeoff complete" << endl;
     
 }
 
@@ -567,30 +562,25 @@ void Fotokite::land() {
     
     goToWaypoint(0, 1, 0, 10, 1, 0, 0, 0, 0);
     
-    cout << "Waypoint reached" << endl;
-    
     disableTetherController();
-    
-    cout << "Disabled tether controller" << endl;
     
     while (getScaledTetherLength() > 0.1) {
         
         if (state->NEW_GSSSTATUS_MESSAGE) {
             posL(-1);
 //            pos2(0,0,-300);
+            
+            cout << "Landing" << endl;
+            
         }
         
     }
     
-    cout << "Landing finished" << endl;
-    
     stopMotors();
-    
-    cout << "Stopped motors" << endl;
     
     enableTetherController();
     
-    cout << "Enabled tether controller" << endl;
+    cout << "Landing complete" << endl;
     
 }
 
@@ -1034,7 +1024,7 @@ bool Fotokite::yawControl(double pointOfInterestX, double pointOfInterestZ, doub
     }
 
     // Gain of P element of PID
-    double pGain = 0.2;
+    double pGain = 0.4;
 
     if (abs(targetYaw - currentYaw) > tolerance) {
 
@@ -1132,8 +1122,6 @@ bool Fotokite::gimbalPitchControl(double pointOfInterestX, double pointOfInteres
         return true;
 
     }
-
-    cout << (targetPitch / PI * 180) << " " << (currentPitch / PI * 180) << endl;
 
 }
 
@@ -1534,21 +1522,24 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
                     waypointDistance, waypointReached, controlMethod, speed, targetYaw,
                     targetGimbalPitch, currentYaw, currentGimbalPitch, pointOfInterestX,
                     pointOfInterestY, pointOfInterestZ, yawRate, gimbalPitchRate);
+            
+            // Print status
+            cout << fixed << std::setprecision(1) << "Waypoint: (" << targetX << ", " << targetY << ", " << targetZ << ")    POI: (" << pointOfInterestX << ", " << pointOfInterestY << ", " << pointOfInterestZ << ")    Current: (" << currentX << ", " << currentY << ", " << currentZ << ")    Distance: " << waypointDistance << " m" << endl;
                     
         }
 
         // Print debugging information to console
         //cout << currentX << " " << currentY << " " << currentZ << " " << waypointDistance << endl;
         //        cout << targetTetherLength << " " << currentTetherLength << " | " << targetElevation << " " << currentElevation << " " << 1.57 - getElevation() << " | " << targetAzimuth << " " << (currentAzimuth / PI * 180) << " | " << waypointDistance << " | " << currentX << " " << currentY << " " << currentZ << endl;
-        //cout << currentElevation << " " << currentAzimuth << endl;      
-
+        //cout << currentElevation << " " << currentAzimuth << endl;
+        
     }
 
     // Waypoint and view is reached so stop Fotokite
     stop();
 
     // Print waypoint reached
-    cout << "Waypoint " << targetX << " " << targetY << " " << targetZ << " reached." << endl;
+    cout << "Waypoint (" << targetX << ", " << targetY << ", " << targetZ << ") with POI (" << pointOfInterestX << ", " << pointOfInterestY << ", " << pointOfInterestZ << ") reached." << endl;
 }
 
 /**
@@ -1668,7 +1659,7 @@ void Fotokite::executePath(string fileName) {
             //            contactPointY += offset; // TODO offset to contact point
 
             // Print target waypoint
-            cout << "Going to waypoint " << x << " " << y << " " << z << " with point of interest " << pointOfInterestX << " " << pointOfInterestY << " " << pointOfInterestZ << " with contact point " << contactPointX << " " << contactPointY << " " << contactPointZ << "." << endl;
+//            cout << "Going to waypoint " << x << " " << y << " " << z << " with point of interest " << pointOfInterestX << " " << pointOfInterestY << " " << pointOfInterestZ << " with contact point " << contactPointX << " " << contactPointY << " " << contactPointZ << "." << endl;
 
             // Go to waypoint
             goToWaypoint(x, y, z, pointOfInterestX, pointOfInterestY, pointOfInterestZ, contactPointX, contactPointY, contactPointZ);
@@ -1681,6 +1672,58 @@ void Fotokite::executePath(string fileName) {
     } else {
 
         cout << "Error opening waypoint file " << fileName << "." << endl;
+
+    }
+
+    cout << "Path completed." << endl;
+
+}
+
+/**
+ * Executes path received as sequence of waypoints on the standard input.
+ * The waypoint sequence has one waypoint per line. Each line contain x, y, z,
+ * and point of interest x, y, z, and contact point x, y, z separated by space.
+ * Each waypoint is ended by new line. The sequence is ended by end of file.
+ * 
+ */
+void Fotokite::executePath() {
+
+    // X
+    double x;
+
+    // Y
+    double y;
+
+    // Z
+    double z;
+
+    // Point of interest x
+    double pointOfInterestX;
+
+    // Point of interest y
+    double pointOfInterestY;
+
+    // Point of interest z
+    double pointOfInterestZ;
+
+    // Contact point x
+    double contactPointX;
+
+    // Contact point y
+    double contactPointY;
+
+    // Contact point z
+    double contactPointZ;
+    
+    // For each line (one line is one waypoint)
+    while (!cin.eof()) {
+        
+        // Read from standard in
+        cin >> x >> y >> z >> pointOfInterestX >> pointOfInterestY >> pointOfInterestZ >> contactPointX >> contactPointY >> contactPointZ;
+        
+        // Go to waypoint
+        goToWaypoint(x, y, z, pointOfInterestX, pointOfInterestY, pointOfInterestZ, contactPointX, contactPointY, contactPointZ);
+//        cout << x << " " << y << " " << z << " " << pointOfInterestX << " " << pointOfInterestY << " " << pointOfInterestZ << " " << contactPointX << " " << contactPointY << " " << contactPointZ << endl;
 
     }
 

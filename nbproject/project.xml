@@ -37,10 +37,6 @@
                     <name>FotokiteExecutePath</name>
                     <type>0</type>
                 </confElem>
-                <confElem>
-                    <name>FotokiteGoToWaypoint_2</name>
-                    <type>0</type>
-                </confElem>
             </confList>
             <formatting>
                 <project-formatting-style>false</project-formatting-style>

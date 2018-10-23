@@ -106,6 +106,7 @@ public:
     void goToWaypoint(double waypoint[9]);
     void goToWaypoint(double, double, double, double, double, double, double, double, double);
     void executePath(string);
+    void executePath();
     
     // Control
     void positionControl(double targetTetherLength, double targetElevation, double targetAzimuth, double tetherTolerance, double ElevationTolerance, double azimuthTolerance, double tetherRate, double elevationRate, double azimuthRate);

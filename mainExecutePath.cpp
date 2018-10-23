@@ -13,18 +13,27 @@
  * 
  */
 int main(int argc, char *argv[]) {
-
+    
     // Check if the program has 1 argument
-    if (argc != 2) {
+    if (argc != 1 && argc != 2 ) {
         return -1;
     }
     
     // Initialize Fotokite interface for OCU server
 //    Fotokite * fotokite = new Fotokite("127.0.0.1", 8080, 8080);
-    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem1");
+    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem01");
     
-    // Go to waypoint
-    fotokite->executePath(argv[1]);
+    if (argc == 1) {
+        
+        // Execute waypoint sequence specified on standard input
+        fotokite->executePath();
+        
+    } else {
+        
+        // Execute waypoint file specified by a path in the argument
+        fotokite->executePath(argv[1]);
+    
+    }
 
     // Delete Fotokite object (important for stopping remote control mode on Fotokite)
     delete fotokite;

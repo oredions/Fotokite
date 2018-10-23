@@ -16,14 +16,15 @@ int main(int argc, char *argv[]) {
 //    Fotokite * fotokite = new Fotokite("127.0.0.1", 8080, 8080);
 
     // Initialize Fotokite interface for USB serial interface
-    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem1");
+    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem01");
 
-    fotokite->takeoff();
+//    fotokite->takeoff();
     
     // Execute path
-    fotokite->executePath("input/velocity_control_test.txt");
+//    fotokite->executePath("input/velocity_control_test.txt");
+    fotokite->executePath();
     
-    fotokite->land();
+//    fotokite->land();
     
 //    fotokite->stopMotors();
     
