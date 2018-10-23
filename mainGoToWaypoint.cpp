@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     
     // Initialize Fotokite interface for OCU server
 //    Fotokite * fotokite = new Fotokite("127.0.0.1", 8080, 8080);
-    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem01");
+    Fotokite * fotokite = new Fotokite(SERIAL_PORT);
     
     // Initialize waypoint
     double waypoint[9];
