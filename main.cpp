@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 //    Fotokite * fotokite = new Fotokite("127.0.0.1", 8080, 8080);
 
     // Initialize Fotokite interface for USB serial interface
-    Fotokite * fotokite = new Fotokite("/dev/cu.usbmodem01");
+    Fotokite * fotokite = new Fotokite(SERIAL_PORT);
 
 //    fotokite->takeoff();
     

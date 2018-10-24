@@ -20,6 +20,7 @@
 #include <vector>
 #include <deque> 
 
+#include "config.h"
 #include "SocketCommunication.hpp"
 #include "SerialCommunication.hpp"
 #include "ContactPoint.hpp"
