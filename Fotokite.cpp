@@ -589,7 +589,7 @@ void Fotokite::land() {
             posL(-1);
 //            pos2(0,0,-300);
             
-            cout << "Landing" << endl;
+            cout << fixed << setprecision(1) << "Landing (" << getScaledTetherLength() << " m)" << endl;
             
         }
         
