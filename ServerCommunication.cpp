@@ -35,6 +35,8 @@ void ServerCommunication::initializeSendPipe(const string pipePath) {
     // Initialize pipe
     sendPipe.open(pipePath);
     
+    cout << "Send pipe " << pipePath << " initialized." << endl;
+    
 }
 
 void ServerCommunication::initializeReceiveSocket(const char * ip_address, const short port) {
@@ -67,6 +69,8 @@ void ServerCommunication::initializeReceiveSocket(const char * ip_address, const
     if (status < 0) {
         cerr << "Error initializing receive socket!" << endl;
     }
+    
+    cout << "Receive socket " << ip_address << ":" << to_string(port) << " initialized." << endl;
     
 }
 
@@ -108,7 +112,7 @@ string ServerCommunication::receive() {
 }
 
 /**
- * Close connection with Fotokite.
+ * Close connection with Fotokite. Do not exit remote control mode as server is still using it.
  */
 void ServerCommunication::close_connection() {
     
@@ -117,12 +121,6 @@ void ServerCommunication::close_connection() {
 
     // Join with listener
     listener.join();
-
-    // Stop Ground Station remote control mode
-    send("stop\n");
-
-    // Stop the pass-throught OCU server
-    send("\x07");
     
     // Close send pipe
     sendPipe.close();
