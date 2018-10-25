@@ -1,10 +1,10 @@
 /* 
- * File:   SocketCommunication.hpp
+ * File:   ServerCommunication.hpp
  * Author: Jan Dufek
  */
 
-#ifndef SOCKETCOMMUNICATION_HPP
-#define SOCKETCOMMUNICATION_HPP
+#ifndef SERVERCOMMUNICATION_HPP
+#define SERVERCOMMUNICATION_HPP
 
 #include <stdio.h>
 #include <unistd.h>
@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <iostream>
+#include <fstream>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <thread>
@@ -20,12 +21,12 @@
 
 using namespace std;
 
-class SocketCommunication : public Communication {
+class ServerCommunication : public Communication {
 public:
     
-    SocketCommunication(FotokiteState *, const char *, const short, const short);
-    SocketCommunication(const SocketCommunication& orig);
-    virtual ~SocketCommunication();
+    ServerCommunication(FotokiteState * fotokiteState, const string pipe_send, const char * ip_address, const short port_receive);
+    ServerCommunication(const ServerCommunication& orig);
+    virtual ~ServerCommunication();
     
     void send(string);
     string receive();
@@ -33,16 +34,15 @@ public:
     
 private:
      
-    void initializeSendSocket(const char *, const short);
+    void initializeSendPipe(const string pipePath);
     void initializeReceiveSocket(const char *, const short);
     
-    int socket_descriptor_send;
-    struct sockaddr_in socket_address_send;
+    ofstream sendPipe;
     
     int socket_descriptor_receive;
     struct sockaddr_in socket_address_receive;
 
 };
 
-#endif /* SOCKETCOMMUNICATION_HPP */
+#endif /* SERVERCOMMUNICATION_HPP */
 

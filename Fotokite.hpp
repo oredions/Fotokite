@@ -23,6 +23,7 @@
 #include "config.h"
 #include "SocketCommunication.hpp"
 #include "SerialCommunication.hpp"
+#include "ServerCommunication.hpp"
 #include "ContactPoint.hpp"
 
 using namespace std;
@@ -32,6 +33,7 @@ class Fotokite {
 public:
     Fotokite(const char *, const short, const short);
     Fotokite(const char *);
+    Fotokite(const string pipe_path, const char * ip_address, const short port_receive);
     Fotokite(const Fotokite& orig);
     virtual ~Fotokite();
     

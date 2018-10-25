@@ -63,6 +63,25 @@ Fotokite::Fotokite(const char * serialPort) {
 
 }
 
+/**
+ * Initialize communication if running on the server.
+ */
+Fotokite::Fotokite(const string pipe_path, const char * ip_address, const short port_receive) {
+
+    // Initialize Fotokite state
+    state = new FotokiteState();
+
+    // Initialize communication with Fotokite OCU Server
+    communication = new ServerCommunication(state, pipe_path, ip_address, port_receive);
+
+    // Initialize log
+    logFile.open("log/" + getCurrentTime() + ".txt");
+
+    // Wait for all the messages to be initialized to make sure Fotokite status makes sense
+    while (!(state->NEW_GSSSTATUS_MESSAGE && state->NEW_ATTITUDE_MESSAGE && state->NEW_GIMBAL_MESSAGE && state->NEW_POS_MESSAGE && state->NEW_FLIGHTSTATUS_MESSAGE));
+
+}
+
 Fotokite::Fotokite(const Fotokite& orig) {
 }
 

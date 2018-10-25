@@ -1,14 +1,14 @@
 /* 
- * File:   SocketCommunication.cpp
+ * File:   ServerCommunication.cpp
  * Author: Jan Dufek
  */
 
-#include "SocketCommunication.hpp"
+#include "ServerCommunication.hpp"
 
-SocketCommunication::SocketCommunication(FotokiteState * fotokiteState, const char * ip_address, const short port_send, const short port_receive) : Communication(fotokiteState) {
+ServerCommunication::ServerCommunication(FotokiteState * fotokiteState, const string send_pipe, const char * ip_address, const short port_receive) : Communication(fotokiteState) {
 
-    // Initialize socket for sending
-    initializeSendSocket(ip_address, port_send);
+    // Initialize pipe for sending
+    initializeSendPipe(send_pipe);
     
     // Initialize socket for receiving
     initializeReceiveSocket(ip_address, port_receive);
@@ -21,40 +21,23 @@ SocketCommunication::SocketCommunication(FotokiteState * fotokiteState, const ch
 
 }
 
-SocketCommunication::SocketCommunication(const SocketCommunication& orig) : Communication(orig) {
+ServerCommunication::ServerCommunication(const ServerCommunication& orig) : Communication(orig) {
 }
 
-SocketCommunication::~SocketCommunication() {
+ServerCommunication::~ServerCommunication() {
     
     close_connection();
     
 }
 
-void SocketCommunication::initializeSendSocket(const char * ip_address, const short port) {
+void ServerCommunication::initializeSendPipe(const string pipePath) {
         
-    // Create socket descriptor. We want to use datagram UDP.
-    socket_descriptor_send = socket(AF_INET, SOCK_STREAM, 0);
-
-    if (socket_descriptor_send < 0) {
-        cout << "Error creating send socket descriptor." << endl;
-    }
-
-    // Create socket address
-    socket_address_send.sin_family = AF_INET;
-    socket_address_send.sin_addr.s_addr = inet_addr(ip_address);
-    socket_address_send.sin_port = htons(port);
-
-    // Connect to the server
-    int status = connect(socket_descriptor_send, (struct sockaddr *) &socket_address_send, sizeof (socket_address_send));
-
-    // Check if the connection was established
-    if (status < 0) {
-        cerr << "Error connecting to the TCP server at IP address " << ip_address << " at port " << to_string(port) << "! Make sure your machine is connected to the OCU server via ethernet and has IP address on the same network." << endl;
-    }
+    // Initialize pipe
+    sendPipe.open(pipePath);
     
 }
 
-void SocketCommunication::initializeReceiveSocket(const char * ip_address, const short port) {
+void ServerCommunication::initializeReceiveSocket(const char * ip_address, const short port) {
     
     // Create socket descriptor. We want to use datagram UDP.
     socket_descriptor_receive = socket(AF_INET, SOCK_STREAM, 0);
@@ -76,6 +59,15 @@ void SocketCommunication::initializeReceiveSocket(const char * ip_address, const
         cerr << "Error connecting to the TCP server at IP address " << ip_address << " at port " << to_string(port) << "! Make sure your machine is connected to the OCU server via ethernet and has IP address on the same network." << endl;
     }
     
+    // Notify socket to start sending data
+    string message = "GET /flog HTTP/1.0\r\n\r\n";
+    status = write(socket_descriptor_receive, message.data(), message.size());
+    
+    // Check if the action was successful
+    if (status < 0) {
+        cerr << "Error initializing receive socket!" << endl;
+    }
+    
 }
 
 /**
@@ -83,16 +75,12 @@ void SocketCommunication::initializeReceiveSocket(const char * ip_address, const
  * 
  * @param message
  */
-void SocketCommunication::send(string message) {
+void ServerCommunication::send(string message) {
 
     // Send message
-    int status = write(socket_descriptor_send, message.data(), message.size());
-
-    // Check if the action was successful
-    if (status < 0) {
-        cerr << "Error writing to the socket!" << endl;
-    }
-
+    sendPipe << message;
+    sendPipe.flush();
+    
 }
 
 /**
@@ -100,7 +88,7 @@ void SocketCommunication::send(string message) {
  * 
  * @return 
  */
-string SocketCommunication::receive() {
+string ServerCommunication::receive() {
 
     // Initialize buffer for the message
     char buffer[512];
@@ -122,7 +110,7 @@ string SocketCommunication::receive() {
 /**
  * Close connection with Fotokite.
  */
-void SocketCommunication::close_connection() {
+void ServerCommunication::close_connection() {
     
     // Stop listening
     listening = false;
@@ -136,8 +124,8 @@ void SocketCommunication::close_connection() {
     // Stop the pass-throught OCU server
     send("\x07");
     
-    // Close send socket
-    close(socket_descriptor_send);
+    // Close send pipe
+    sendPipe.close();
     
     // Close receive socket
     close(socket_descriptor_receive);
