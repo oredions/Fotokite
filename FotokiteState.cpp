@@ -65,6 +65,7 @@ void FotokiteState::updateSingle(string message) {
         this->QZ = stod(nextToken(&message, ","));
         
         NEW_ATTITUDE_MESSAGE = true;
+        LOG_DATA = true;
         
     } else if (header.compare("!Gimbal") == 0) {
         
@@ -75,6 +76,7 @@ void FotokiteState::updateSingle(string message) {
         this->gimbalQZ = stod(nextToken(&message, ","));
         
         NEW_GIMBAL_MESSAGE = true;
+        LOG_DATA = true;
 
     } else if (header.compare("!Pos") == 0) {
         
@@ -84,6 +86,7 @@ void FotokiteState::updateSingle(string message) {
         this->baroAlt = stod(nextToken(&message, ","));
         
         NEW_POS_MESSAGE = true;
+        LOG_DATA = true;
 
     } else if (header.compare("!FlightStatus") == 0) {
 

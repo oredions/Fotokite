@@ -586,11 +586,14 @@ void Fotokite::land() {
     while (getScaledTetherLength() > 0.1) {
         
         if (state->NEW_GSSSTATUS_MESSAGE) {
+            
+            state->NEW_GSSSTATUS_MESSAGE = false;
+            
             posL(-1);
 //            pos2(0,0,-300);
             
             cout << fixed << setprecision(1) << "Landing (" << getScaledTetherLength() << " m)" << endl;
-            
+                        
         }
         
     }
@@ -1531,8 +1534,8 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
         viewReached = viewControl(pointOfInterestX, pointOfInterestY, pointOfInterestZ, currentX, currentY, currentZ, 0.1, 0.1, targetYaw, targetGimbalPitch, currentYaw, currentGimbalPitch, yawRate, gimbalPitchRate);
 
         // Only log if there is a new information
-        if (state->NEW_POS_MESSAGE || state->NEW_ATTITUDE_MESSAGE || state->NEW_GIMBAL_MESSAGE) {
-            
+        if (state->LOG_DATA) {
+                        
             // Log
             log(targetX, targetY, targetZ, targetTetherLength, targetElevation, targetAzimuth,
                     currentTetherLength, currentElevation, currentAzimuth, currentX,
@@ -1544,7 +1547,10 @@ void Fotokite::goToWaypoint(double targetX, double targetY, double targetZ, doub
             
             // Print status
             cout << fixed << std::setprecision(1) << "Waypoint: (" << targetX << ", " << targetY << ", " << targetZ << ")    POI: (" << pointOfInterestX << ", " << pointOfInterestY << ", " << pointOfInterestZ << ")    Current: (" << currentX << ", " << currentY << ", " << currentZ << ")    Distance: " << waypointDistance << " m" << endl;
-                    
+            
+            // We log the new data so set the flag to false so that we do not log this again
+            state->LOG_DATA = false;
+            
         }
 
         // Print debugging information to console

@@ -58,6 +58,8 @@ public:
     bool NEW_POS_MESSAGE = false;
     bool NEW_FLIGHTSTATUS_MESSAGE = false;
     
+    bool LOG_DATA = false;
+    
 private:
     
     string nextToken(string *, string);
