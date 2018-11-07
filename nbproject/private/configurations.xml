@@ -167,8 +167,9 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}/Fotokite"</runcommandpicklistitem>
           <runcommandpicklistitem>"Fotokite"</runcommandpicklistitem>
           <runcommandpicklistitem>"./Fotokite"</runcommandpicklistitem>
+          <runcommandpicklistitem>"./bin/Fotokite"</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"./Fotokite"</runcommand>
+        <runcommand>"./bin/Fotokite"</runcommand>
         <rundir></rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>
@@ -213,8 +214,9 @@
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
           <runcommandpicklistitem>"./FotokiteTakeoff"</runcommandpicklistitem>
+          <runcommandpicklistitem>"./bin/FotokiteTakeoff"</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"./FotokiteTakeoff"</runcommand>
+        <runcommand>"./bin/FotokiteTakeoff"</runcommand>
         <rundir></rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>
@@ -259,8 +261,9 @@
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
           <runcommandpicklistitem>"./FotokiteLand"</runcommandpicklistitem>
+          <runcommandpicklistitem>"./bin/FotokiteLand"</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"./FotokiteLand"</runcommand>
+        <runcommand>"./bin/FotokiteLand"</runcommand>
         <rundir></rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>
@@ -307,8 +310,9 @@
           <runcommandpicklistitem>"./FotokiteGoToWaypoint"</runcommandpicklistitem>
           <runcommandpicklistitem>"./FotokiteGoToWaypoint 1 1 1 0 0 0 0 0 0"</runcommandpicklistitem>
           <runcommandpicklistitem>"./FotokiteGoToWaypoint" 1 1 1 0 0 0 0 0 0</runcommandpicklistitem>
+          <runcommandpicklistitem>"./bin/FotokiteGoToWaypoint" 1 1 1 0 0 0 0 0 0</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"./FotokiteGoToWaypoint" 1 1 1 0 0 0 0 0 0</runcommand>
+        <runcommand>"./bin/FotokiteGoToWaypoint" 1 1 1 0 0 0 0 0 0</runcommand>
         <rundir></rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>
@@ -353,8 +357,9 @@
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
           <runcommandpicklistitem>"./FotokiteExecutePath"</runcommandpicklistitem>
+          <runcommandpicklistitem>"./bin/FotokiteExecutePath"</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"./FotokiteExecutePath"</runcommand>
+        <runcommand>"./bin/FotokiteExecutePath"</runcommand>
         <rundir></rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>

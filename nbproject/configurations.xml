@@ -293,6 +293,10 @@
         <dependencyChecking>false</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
+      <flagsDictionary>
+        <element flagsID="0"
+                 commonFlags="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -std=gnu++11"/>
+      </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
       <makefileType>
@@ -311,62 +315,56 @@
       <item path="CMakeFiles/3.7.2/CompilerIdC/CMakeCCompilerId.c"
             ex="false"
             tool="0"
-            flavor2="0">
+            flavor2="2">
       </item>
       <item path="CMakeFiles/3.7.2/CompilerIdCXX/CMakeCXXCompilerId.cpp"
             ex="false"
             tool="1"
-            flavor2="0">
+            flavor2="4">
       </item>
-      <item path="CMakeFiles/feature_tests.c" ex="false" tool="0" flavor2="0">
+      <item path="CMakeFiles/feature_tests.c" ex="false" tool="0" flavor2="2">
       </item>
-      <item path="CMakeFiles/feature_tests.cxx" ex="false" tool="1" flavor2="0">
+      <item path="CMakeFiles/feature_tests.cxx" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="Communication.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Communication.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="Communication.hpp" ex="false" tool="3" flavor2="0">
+      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="ContactPoint.hpp" ex="false" tool="3" flavor2="0">
+      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Serial.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="Fotokite.hpp" ex="false" tool="3" flavor2="0">
+      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="0">
+      <item path="ServerCommunication.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="FotokiteState.hpp" ex="false" tool="3" flavor2="0">
+      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="Serial.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Visualization.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="Serial.h" ex="false" tool="3" flavor2="0">
+      <item path="main.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="0">
+      <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="SerialCommunication.hpp" ex="false" tool="3" flavor2="0">
+      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="ServerCommunication.cpp" ex="false" tool="1" flavor2="0">
+      <item path="mainLand.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="ServerCommunication.hpp" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="SocketCommunication.hpp" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Visualization.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="Visualization.hpp" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mainLand.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="0">
+      <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
     </conf>
     <conf name="FotokiteLand" type="0">
@@ -539,6 +537,10 @@
         <dependencyChecking>false</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
+      <flagsDictionary>
+        <element flagsID="0"
+                 commonFlags="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -std=gnu++11"/>
+      </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
       <makefileType>
@@ -557,62 +559,122 @@
       <item path="CMakeFiles/3.7.2/CompilerIdC/CMakeCCompilerId.c"
             ex="false"
             tool="0"
-            flavor2="0">
+            flavor2="2">
       </item>
       <item path="CMakeFiles/3.7.2/CompilerIdCXX/CMakeCXXCompilerId.cpp"
             ex="false"
             tool="1"
-            flavor2="0">
+            flavor2="4">
       </item>
-      <item path="CMakeFiles/feature_tests.c" ex="false" tool="0" flavor2="0">
+      <item path="CMakeFiles/feature_tests.c" ex="false" tool="0" flavor2="2">
       </item>
-      <item path="CMakeFiles/feature_tests.cxx" ex="false" tool="1" flavor2="0">
+      <item path="CMakeFiles/feature_tests.cxx" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="Communication.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Communication.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="Communication.hpp" ex="false" tool="3" flavor2="0">
+      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="ContactPoint.hpp" ex="false" tool="3" flavor2="0">
+      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Serial.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="Fotokite.hpp" ex="false" tool="3" flavor2="0">
+      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="0">
+      <item path="ServerCommunication.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="FotokiteState.hpp" ex="false" tool="3" flavor2="0">
+      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="Serial.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Visualization.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="Serial.h" ex="false" tool="3" flavor2="0">
+      <item path="main.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="0">
+      <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="SerialCommunication.hpp" ex="false" tool="3" flavor2="0">
+      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="ServerCommunication.cpp" ex="false" tool="1" flavor2="0">
+      <item path="mainLand.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="ServerCommunication.hpp" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="SocketCommunication.hpp" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Visualization.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="Visualization.hpp" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mainLand.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="0">
+      <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
     </conf>
   </confs>

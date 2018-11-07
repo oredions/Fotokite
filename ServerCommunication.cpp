@@ -62,7 +62,7 @@ void ServerCommunication::initializeReceiveSocket(const char * ip_address, const
     }
     
     // Notify socket to start sending data
-    string message = "GET /flog HTTP/1.0\r\n\r\n";
+    string message = "GET /fstat HTTP/1.0\r\n\r\n";
     status = write(socket_descriptor_receive, message.data(), message.size());
     
     // Check if the action was successful
