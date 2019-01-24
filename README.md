@@ -7,15 +7,15 @@ Two communication methods are implemented to communicate with Fotokite. The firs
 
 ## Publications
 
-Details about the project can be found in the following IEEE publications:
+Details about the project can be found in the following publications:
 
-[Visual pose stabilization of tethered small unmanned aerial system to assist drowning victim recovery](http://ieeexplore.ieee.org/document/8088149/)
+[Visual servoing for teleoperation using a tethered UAV](http://ieeexplore.ieee.org/document/8088155/) (IEEE SSRR 2017)
 
-[Visual servoing for teleoperation using a tethered UAV](http://ieeexplore.ieee.org/document/8088155/)
+[Visual pose stabilization of tethered small unmanned aerial system to assist drowning victim recovery](http://ieeexplore.ieee.org/document/8088149/) (IEEE SSRR 2017)
 
-Motion planning for a UAV with a straight or kinked tether (accepted to IROS 2018)
+[Indoor UAV localization using a tether](https://ieeexplore.ieee.org/document/8468627) (IEEE SSRR 2018)
 
-Indoor UAV Localization Using a Tether (accepted to SSRR 2018)
+[Motion planning for a UAV with a straight or kinked tether](https://ieeexplore.ieee.org/document/8594461) (IEEE/RSJ IROS 2018)
 
 ## Run
 

@@ -326,25 +326,79 @@
       </item>
       <item path="CMakeFiles/feature_tests.cxx" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="Communication.cpp" ex="false" tool="1" flavor2="4">
+      <item path="Communication.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="4">
+      <item path="ContactPoint.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="4">
+      <item path="Fotokite.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="4">
+      <item path="FotokiteState.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="Serial.cpp" ex="false" tool="1" flavor2="4">
+      <item path="Serial.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="4">
+      <item path="SerialCommunication.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="ServerCommunication.cpp" ex="false" tool="1" flavor2="4">
+      <item path="ServerCommunication.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="4">
+      <item path="SocketCommunication.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
       <item path="Visualization.cpp" ex="false" tool="1" flavor2="4">
       </item>
-      <item path="main.cpp" ex="false" tool="1" flavor2="4">
+      <item path="main.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
       <item path="mainExecutePath.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
@@ -354,9 +408,21 @@
           </incDir>
         </ccTool>
       </item>
-      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="4">
+      <item path="mainGoToWaypoint.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
-      <item path="mainLand.cpp" ex="false" tool="1" flavor2="4">
+      <item path="mainLand.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/opencv</pElem>
+          </incDir>
+        </ccTool>
       </item>
       <item path="mainTakeoff.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
